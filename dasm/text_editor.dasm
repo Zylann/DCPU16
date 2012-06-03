@@ -1,0 +1,140 @@
+;based on "Simple text editor with colors" by dzienny
+;based on "Sumple Text Editor" by rrock.ru
+
+	HWN J
+:detect_hardware
+	HWQ I
+	IFE 0x7349, B
+		IFE 0xf615, A
+			set [display_int], I
+	IFE 0x30cf, B
+		IFE 0x7406, A
+			set [key_int], I
+	ADD I, 1
+	ife i, j
+		set pc, init_screen
+	set pc, detect_hardware
+
+:init_screen
+	SET B, [screen_pos]
+	SET A, 0
+	HWI [display_int]
+
+:main_loop
+	jsr shift_screen
+	set a, [carot_char]
+	bor a, 0xe000
+	set [b], a
+	set c, 0
+	jsr check_key
+	ife c, 0
+		set pc, main_loop
+	ife c, 0x90
+		set pc, main_loop
+	ife c, 0x91
+		set pc, main_loop
+	jsr process_spec_keys
+	ifn y, 0
+		set pc, main_loop
+	set a, [fore_color]
+	shl a, 12
+	bor c, a
+	set a, [back_color]
+	shl a, 8
+	bor c, a
+	set [b], c
+	add b, 1
+	SET pc, main_loop
+
+:shift_screen
+	set push, x
+	set x, b
+	sub x, [screen_pos]
+	ifl x, 0x180
+		ife [screen_pos], 0x8000
+			set pc, shift_end
+	ifl x, 0x160
+		ifg [screen_pos], 0x8000
+			sub [screen_pos], 0x40
+	ifg x, 0x17f
+		add [screen_pos], 0x20
+	set push, a
+	set push, b
+	SET B, [screen_pos]
+	SET A, 0
+	HWI [display_int]
+	set b, pop
+	set a, pop
+:shift_end
+	set x, pop
+	set pc, pop
+
+:check_key
+	set a, 1
+	hwi [key_int]
+	set pc, pop
+
+:process_spec_keys
+	set y, 0
+	ife c, 0x10
+		set pc, backspace
+	ife c, 0x11
+		set pc, return
+	ife c, 0x08
+		set y, 1
+	ife c, 0x0D
+		set y, 1
+	set pc, pop
+
+:backspace
+	set push, a
+	set y, 1
+	set [b], 0
+	sub b, 1
+	ife [b], 0
+		jsr dostuff
+	ifl b, 0x8000
+		set b, 0x8000
+	set a, pop
+	set pc, pop
+
+:dostuff
+	ife [b], 0
+		sub b, 1
+	ifl b, 0x8000
+		set pc, pop
+	set a, b
+	mod a, 32
+	ife a, 0
+		set pc, pop
+	ife [b], 0
+		set pc, dostuff
+	add b, 1
+	set pc, pop
+
+:return
+	set [b], 0
+	set y, 1
+	sub b, [screen_pos]
+	and b, 0xFFE0
+	add b, 0x0020
+	add b, [screen_pos]
+	set pc, pop
+
+;Variables
+:key_int
+	dat 0x0
+:display_int
+	dat 0x0
+:fore_color
+	dat 0xf ;0x0 .. 0xf
+:back_color
+	dat 0x1 ;0x0 .. 0xf
+:carot_char
+	dat 0x5f
+:screen_pos
+	dat 0x8000
+
+:ende
+
+
