@@ -5,16 +5,15 @@ namespace dcpu
 {
     void LEM1802::connect(DCPU & dcpu)
     {
-        if(r_dcpu != 0)
-            disconnect();
-        r_dcpu = &dcpu;
-        r_dcpu->connectHardware(this);
+        HardwareDevice::connect(dcpu);
+        m_vramAddr = 0;
+        m_fontAddr = 0;
+        m_paletteAddr = 0;
     }
 
     void LEM1802::disconnect()
     {
-        r_dcpu->disconnectHardware(this);
-        r_dcpu = 0;
+        HardwareDevice::disconnect();
         m_vramAddr = 0;
         m_fontAddr = 0;
         m_paletteAddr = 0;
@@ -156,7 +155,12 @@ namespace dcpu
 
     void LEM1802::render(sf::RenderWindow & win)
     {
+        #if DCPU_DEBUG == 1
         assert(r_dcpu != 0);
+        #else
+        if(r_dcpu == 0)
+            return;
+        #endif
 
         if(m_vramAddr == 0)
             return;

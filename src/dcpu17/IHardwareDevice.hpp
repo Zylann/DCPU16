@@ -13,7 +13,6 @@ namespace dcpu
         virtual u16 getVersion() const = 0;
         virtual u32 getManufacturerID() const = 0;
         virtual void interrupt() = 0;
-        virtual void update(float delta) = 0;
     };
 
 } // namespace dcpu

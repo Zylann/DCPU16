@@ -16,11 +16,11 @@
 
 #include <SFML/Graphics.hpp>
 
-#include "IHardwareDevice.hpp"
+#include "HardwareDevice.hpp"
 
 namespace dcpu
 {
-    class LEM1802 : public IHardwareDevice
+    class LEM1802 : public HardwareDevice
     {
     private :
 
@@ -28,7 +28,6 @@ namespace dcpu
         sf::Image m_font;
         sf::Sprite m_fontSprite;
 
-        DCPU * r_dcpu;
         u16 m_vramAddr;
         u16 m_fontAddr;
         u16 m_paletteAddr;
@@ -46,29 +45,24 @@ namespace dcpu
             MEM_DUMP_PALETTE    // 5
         };
 
-        LEM1802()
+        LEM1802() : HardwareDevice()
         {
-            r_dcpu = 0;
             m_vramAddr = 0;
             m_fontAddr = 0;
             m_paletteAddr = 0;
+            m_name = "LEM1802";
+            m_HID = DCPU_LEM1802_HID;
+            m_manufacturerID = DCPU_LEM1802_MANUFACTURER_ID;
+            m_version = DCPU_LEM1802_VERSION;
 
             m_fontSprite.SetImage(m_font);
         }
 
-        virtual u32 getHID() const
-        { return DCPU_LEM1802_HID; }
-
-        virtual u16 getVersion() const
-        { return DCPU_LEM1802_VERSION; }
-
-        virtual u32 getManufacturerID() const
-        { return DCPU_LEM1802_MANUFACTURER_ID; }
-
-        void connect(DCPU & dcpu);
-        void disconnect();
+        virtual void connect(DCPU & dcpu);
+        virtual void disconnect();
 
         virtual void interrupt();
+        virtual void update(float delta);
 
         void intMapScreen();
         void intMapFont();
@@ -78,7 +72,6 @@ namespace dcpu
         void intDumpPalette();
 
         bool loadFontFromImage(const std::string & filename);
-        void update(float delta);
         void render(sf::RenderWindow & win);
 
     };
