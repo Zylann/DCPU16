@@ -5,6 +5,7 @@
 
 #include "DCPU.hpp"
 #include "LEM1802.hpp"
+#include "Keyboard.hpp"
 
 // Old DCPU standards
 #define DCPU11_VRAM_START 0x8000 // Video
@@ -33,6 +34,7 @@ namespace dcpu
         DCPU m_dcpu;        // CPU
         // Hardware devices
         LEM1802 m_lem;      // Monitor
+        Keyboard m_keyboard;
 
     public :
 

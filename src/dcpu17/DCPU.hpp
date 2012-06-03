@@ -198,6 +198,13 @@ namespace dcpu
             (code == 0x1a || code == 0x1e || code == 0x1f);
     }
 
+    // Is the opcode an IF-like ?
+    inline bool isBranchingOP(u8 opcode)
+    {
+        return opcode >= OP_IFB && opcode <= OP_IFU;
+    }
+
+
     class IHardwareDevice;
 
     class DCPU
@@ -265,7 +272,10 @@ namespace dcpu
         u16 getHDCount() const { return m_hardwareDevices.size(); }
 
         bool isBroken() const { return m_broken; }
+
+        // Setters
         void setBroken(bool b);
+        void setRegister(u8 i, u16 value) { m_r[i] = value; }
 
         // Prints CPU state as text in a stream
         void printState(std::ostream & os);
@@ -290,7 +300,7 @@ namespace dcpu
         u16 * operand(u16 code, bool isB);
 
         // Skips one instruction
-        void skip(bool fromIF = false);
+        void skip(bool fromIF);
 
         // Performs the basic operation that have just been read
         void basicOp(u16 op);

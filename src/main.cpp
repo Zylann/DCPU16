@@ -12,7 +12,7 @@ int main(int argc, char * argv[])
 {
     /* Handle command line arguments */
     // TODO main: test input program filename
-    std::string programFileName = "cputest.dasm";
+    std::string programFileName = "dasm/text_editor.dasm";
     if(argc == 2)
     {
         programFileName = argv[1];

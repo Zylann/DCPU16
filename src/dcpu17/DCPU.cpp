@@ -174,17 +174,16 @@ namespace dcpu
                 m_pc++;
         }
 
-        //if(fromIF)
-        //{
+        m_cycles++;
+
+        if(fromIF)
+        {
             // The branching opcodes take one cycle longer to perform if the test fails
             // When they skip an if instruction, they will skip an additional instruction
             // at the cost of one extra cycle. This lets you easily chain conditionals.
-
-            // TODO 1.7: skip one more instruction if the next is a branching opcode
-
-        //}
-
-        m_cycles++;
+            if(isBranchingOP(decodeOp(op)))
+                skip(false);
+        }
     }
 
     // Executes one instruction
@@ -589,7 +588,9 @@ namespace dcpu
     {
         if(m_hardwareDevices.size() == DCPU_MAX_HD)
         {
+            #if DCPU_DEBUG == 1
             std::cout << "E: can't connect another hardware device, limit has been reached" << std::endl;
+            #endif
             return m_hardwareDevices.size();
         }
         for(u16 i = 0; i < m_hardwareDevices.size(); i++)

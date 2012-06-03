@@ -55,6 +55,7 @@ namespace dcpu
 
         // Connect devices
         m_lem.connect(m_dcpu);
+        m_keyboard.connect(m_dcpu);
 
         // Video mode
         int ratio = 4;
@@ -75,6 +76,7 @@ namespace dcpu
 
         sf::Event event;
         const sf::Input & input = m_win->GetInput();
+        m_keyboard.setInput(&input);
         float delta = 0;
 
         // Start the main loop
@@ -101,6 +103,9 @@ namespace dcpu
                     if(event.Key.Code == sf::Key::F3)
                         m_dcpu.printState(std::cout);
                 }
+
+                if(!input.IsKeyDown(sf::Key::Tab))
+                    m_keyboard.onEvent(event);
             }
 
             // Clear window's pixels
@@ -120,6 +125,10 @@ namespace dcpu
             // Update the window
             m_win->Display();
         }
+
+        m_keyboard.setInput(0);
+        m_keyboard.disconnect();
+        m_lem.disconnect();
 
         // Delete window
         if(m_win != 0)
