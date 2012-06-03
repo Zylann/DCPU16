@@ -242,6 +242,7 @@ namespace dcpu
         }
 
         /* Label definition */
+        // TODO allow ":label <op stuff...>" syntax
 
         if(m_line[m_pos] == ':')
         {
