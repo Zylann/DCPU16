@@ -1,0 +1,81 @@
+:begin
+	set a, 0x000f
+	jsr sleep
+	jsr clearscreen
+	set a, msg
+	set b, 0x8000
+	jsr strcpy			; Hello World !
+	set a, 0x02ff
+	jsr sleep
+	set a, 0x8000
+	set b, 0x8180
+	set c, 0x001b
+	jsr memset			; set a white screen
+	set pc, begin
+	;set pc, end
+
+:msg
+	dat "Hello World !", 0
+:msgformat
+	dat 0xf0
+
+;--------0xLib--------
+
+:sleep
+	set push, a
+	:sleep_continue
+		ife a, 0
+			set pc, sleep_end
+		sub a, 1
+		set pc, sleep_continue
+	:sleep_end
+	set a, pop
+	set pc, pop
+
+:clearscreen
+	set push, a
+	set a, 0x8000
+	:clearscreen_loop
+		ife a, 0x8180
+			set pc, clearscreen_loop_end
+		set [a], 0x20 ;space
+		add a, 1
+		set pc, clearscreen_loop
+	:clearscreen_loop_end
+	set a, pop
+	set pc, pop
+	
+:memset
+;a=start, b=end, c=value
+	set push, a
+	:memset_loop
+		ife a, b
+			set pc, memset_loop_end
+		set [a], c
+		add a, 1
+		set pc, memset_loop
+	:memset_loop_end
+	set a, pop
+	set pc, pop
+
+:strcpy
+;Copies a zero-terminated string from a place to another
+;a=str adress, b=dest address
+	set push, a
+	set push, b
+	:strcpy_loop
+    	ife [a], 0
+        	set pc, strcpy_endloop
+        set [b], [a]
+        add a, 1
+        add b, 1
+        set pc, strcpy_loop
+    :strcpy_endloop
+	set b, pop
+	set a, pop
+	set pc, pop
+
+:end
+	set pc, end
+
+

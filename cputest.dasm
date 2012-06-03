@@ -1,0 +1,93 @@
+:get_display
+	add [display_addr], 1
+    hwq [display_addr]
+    ifn a, 0xf615 ; ID for the LEM1802 monitor
+    	set pc, get_display
+	set pc, init
+
+:init
+	set a, 0 ; MEM_MAP_SCREEN mode
+	set b, [vram_addr]
+	hwi [display_addr]
+    set pc, main
+
+:main
+	set a, hello
+	set b, [vram_addr]
+	set c, 0xf000
+	jsr printstr
+	set a, 0x00ff
+	jsr sleep
+	jsr printcharset
+	set pc, crash
+		
+:crash
+	set pc, crash
+
+;------------------------ Global vars ------------------------------------------
+
+:hello
+	dat "Hello World !", 0
+	
+:display_addr
+	dat 0xffff
+	
+:vram_addr
+	dat 0x8000
+
+;------------------------ 0xLib ------------------------------------------------
+
+:printstr
+;a=str address, b=dest address, c=format
+	set push, a
+	set push, b
+	:printstr_loop
+		ife [a], 0
+			set pc, printstr_loop_end
+		set [b], [a]
+		bor [b], c
+		add a, 1
+		add b, 1
+		set pc, printstr_loop
+	:printstr_loop_end
+	set b, pop
+	set a, pop
+	set pc, pop
+
+:printcharset
+	set push, a
+	set push, b
+	set a, 0
+	set b, [vram_addr]
+	:printcharset_loop
+		ife a, 128
+			set pc, printcharset_end
+		set [b], a
+		bor [b], 0xf700
+		add a, 1
+		add b, 1
+		set pc, printcharset_loop
+	:printcharset_end
+	set b, pop
+	set a, pop
+	set pc, pop
+	
+:sleep
+;a=counter
+	set push, a
+	:sleep_loop
+		ife a, 0
+			set pc, sleep_end
+		sub a, 1
+		set pc, sleep_loop
+	:sleep_end
+	set a, pop
+	set pc, pop
+	
+
+	
+	
+	
+
+
+

@@ -1,0 +1,13 @@
+/bin
+/backups
+/assets/src
+/obj
+/releases
+*.o
+*.depend
+*.cbp
+*.layout
+dump0.txt
+dump1.txt
+*~
+
