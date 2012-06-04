@@ -21,10 +21,10 @@ namespace dcpu
 
 #include "IHardwareDevice.hpp"
 
-// Enable debug messages
+// Enable debug messages + behavior
 // 1 : on
 // 0 : off
-#define DCPU_DEBUG 0
+#define DCPU_DEBUG 1
 
 #define DCPU_REG_COUNT 8
 #define DCPU_RAM_SIZE 65536
@@ -269,6 +269,7 @@ namespace dcpu
         u16 getIA() const { return m_ia; }
         u32 getSteps() const { return m_steps; }
         u32 getCycles() const { return m_cycles; }
+        u32 getHaltCycles() const { return m_haltCycles; }
         u16 getHDCount() const { return m_hardwareDevices.size(); }
 
         bool isBroken() const { return m_broken; }

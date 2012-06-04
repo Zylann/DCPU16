@@ -238,7 +238,6 @@ namespace dcpu
         s32 res = 0;
         m_cycles += opCost[opcode];
 
-        // TODO swap A/B
         switch (opcode)
         {
         case OP_SET:
