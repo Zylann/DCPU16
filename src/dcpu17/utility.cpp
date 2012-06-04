@@ -1,10 +1,90 @@
 #include <fstream>
+#include <SFML/Graphics.hpp> // for sf::Image
 
 #include "utility.hpp"
 #include "Assembler.hpp"
 
 namespace dcpu
 {
+    bool convertImageToDASMFont(
+        const std::string & inputFilename,
+        const std::string & outputFilename)
+    {
+        /* Load image */
+        sf::Image img;
+        if(!img.LoadFromFile(inputFilename))
+        {
+            std::cout << "E: Couldn't open image '"
+                << inputFilename << "'" << std::endl;
+            return false;
+        }
+
+        /* Check image */
+        if(img.GetWidth() < 128 || img.GetHeight() < 32)
+        {
+            std::cout << "E: The input image have an invalid size." << std::endl;
+            return false;
+        }
+
+        /* Create output file */
+        std::ofstream ofs(
+            outputFilename.c_str(),
+            std::ios::out|std::ios::binary|std::ios::trunc);
+
+        /* Check output file */
+        if(!ofs.good())
+        {
+            std::cout << "E: Couldn't create file '"
+                << outputFilename << "'" << std::endl;
+            ofs.close();
+            return false;
+        }
+
+        /* Convert */
+
+        u16 cx, cy, k = 0;
+        char hex[4] = {'0'};
+        // For each glyph
+        for(cy = 0; cy < 4; cy++)
+        for(cx = 0; cx < 32; cx++, k++)
+        {
+            // Glyph pos in pixels
+            u16 x = cx * 4;
+            u16 y = cy * 8;
+
+            u32 fontcode = 0;
+            u32 mask = 0x80000000;
+
+            // For each pixel of the glyph
+            for(u16 i = 0; i < 4; i++)
+            for(u16 j = 0; j < 8; j++)
+            {
+                sf::Color pix = img.GetPixel(x + i, y + 7 - j);
+                if(pix == sf::Color(255,255,255))
+                    fontcode |= mask;
+                mask = mask >> 1; // mask is unsigned, then this is a logical shift
+            }
+
+            // Split fontcode in two 16-bit words
+            u16 w1 = fontcode >> 16;
+            u16 w2 = fontcode & 0x0000ffff;
+
+            // Write DASM code
+            ofs << "dat 0x";
+            u16ToHexStr(w1, hex);
+            ofs << hex << ", 0x";
+            u16ToHexStr(w2, hex);
+            ofs << hex;
+            if(k >= 0x20 && k <= 0x7e)
+                ofs << " ; '" << (char)k << "'";
+            ofs << "\n";
+        }
+
+        std::cout << "I: Image converted." << std::endl;
+        ofs.close();
+        return true;
+    }
+
     char u4ToHexChar(u8 n)
     {
         n &= 0xf;

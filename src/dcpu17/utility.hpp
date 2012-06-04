@@ -24,6 +24,11 @@ namespace dcpu
     // Dumps DCPU memory to a file
     bool dumpAsText(DCPU & cpu, const std::string & filename);
 
+    // Converts an image to DASM "DAT" font code
+    bool convertImageToDASMFont(
+        const std::string & inputFilename,
+        const std::string & outputFilename);
+
     /* General purpose */
 
     // Clears the console
