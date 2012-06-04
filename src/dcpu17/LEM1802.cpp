@@ -86,16 +86,77 @@ namespace dcpu
     void LEM1802::intMapFont()
     {
         // Reads the B register, and maps the font ram to DCPU-16 ram starting
-        // at address B. See below for a description of font ram.
+        // at address B.
         // If B is 0, the default font is used instead.
+        #if DCPU_DEBUG == 1
         assert(r_dcpu != 0);
-        // TODO LEM1802: mapFont
+        #else
+        if(r_dcpu == 0)
+            return;
+        #endif
+
+        u16 addr = r_dcpu->getRegister(AD_B);
+
+        if(addr == 0)
+        {
+            #if DCPU_DEBUG == 1
+            std::cout << "I: LEM1802: Mapping default font" << std::endl;
+            #endif
+            m_font = m_defaultFont;
+            return;
+        }
+
+        if(DCPU_RAM_SIZE - addr < 256)
+        {
+            std::cout << "E: LEM1802: Can't map font from adress "
+                << (int)addr << ", not enough space" << std::endl;
+            return;
+        }
+
+        #if DCPU_DEBUG == 1
+        std::cout << "I: LEM1802: Mapping font to addr=" << (int)addr << std::endl;
+        #endif
+
+        // For each glyph
+        for(u16 k = 0; k < 128; k++, addr += 2)
+        {
+            // Get fontcode
+            u32 w1 = r_dcpu->getMemory(addr);
+            u32 w2 = r_dcpu->getMemory(addr+1);
+            // Font example with letter 'F':
+            // word0 = 11111111 /
+            //         00001001
+            // word1 = 00001001 /
+            //         00000000
+            u32 fontcode = (w1 << 16) | w2; // Note : '<<' is always a logical shift
+
+            // Get glyph pos
+            u16 cx = (k % 32) * DCPU_LEM1802_TILE_W;
+            u16 cy = (k / 32) * DCPU_LEM1802_TILE_H;
+
+            // Decode fontcode
+            for(u16 i = 0; i < DCPU_LEM1802_TILE_W; i++)
+            for(u16 j = 0; j < DCPU_LEM1802_TILE_H; j++)
+            {
+                u16 x = cx + i;
+                u16 y = cy + 7 - j;
+
+                if(fontcode > 0x7fffffff)
+                    m_font.SetPixel(x, y, sf::Color(255,255,255,255));
+                else
+                    m_font.SetPixel(x, y, sf::Color(0,0,0,0));
+
+                fontcode <<= 1;
+            }
+        }
+
+        r_dcpu->halt(256);
     }
 
     void LEM1802::intMapPalette()
     {
         // Reads the B register, and maps the palette ram to DCPU-16 ram starting
-        // at address B. See below for a description of palette ram.
+        // at address B.
         // If B is 0, the default palette is used instead.
         assert(r_dcpu != 0);
         // TODO LEM1802: handle palette

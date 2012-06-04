@@ -32,7 +32,6 @@ namespace dcpu
         u16 m_fontAddr;
         u16 m_paletteAddr;
 
-
     public :
 
         enum InterruptCodes
