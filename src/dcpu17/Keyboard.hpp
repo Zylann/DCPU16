@@ -18,7 +18,8 @@ namespace dcpu
     private :
 
         u16 m_buffer[DCPU_GENERIC_KEYBOARD_BUFSIZE]; // cyclic buffer
-        u16 m_bufferPos;
+        u16 m_bufferWritePos;
+        u16 m_bufferReadPos;
         u16 m_interruptMsg;
 
         const sf::Input * r_input;
@@ -39,7 +40,7 @@ namespace dcpu
         void setInput(const sf::Input * input) { r_input = input; }
         void onEvent(const sf::Event & e);
         void pushEvent(u16 k);
-        u16 popEvent();
+        u16 nextEvent();
         bool isKeyPressed(u16 k);
         void clearBuffer();
         virtual void interrupt();

@@ -62,11 +62,11 @@ namespace dcpu
 
     void Keyboard::pushEvent(u16 k)
     {
-        m_buffer[m_bufferPos] = k;
+        m_buffer[m_bufferWritePos] = k;
 
-        m_bufferPos++;
-        if(m_bufferPos >= DCPU_GENERIC_KEYBOARD_BUFSIZE)
-            m_bufferPos = 0;
+        m_bufferWritePos++;
+        if(m_bufferWritePos >= DCPU_GENERIC_KEYBOARD_BUFSIZE)
+            m_bufferWritePos = 0;
 
         if(m_interruptMsg)
         {
@@ -76,15 +76,14 @@ namespace dcpu
         }
     }
 
-    u16 Keyboard::popEvent()
+    u16 Keyboard::nextEvent()
     {
-        if(m_bufferPos == 0)
-            m_bufferPos = DCPU_GENERIC_KEYBOARD_BUFSIZE - 1;
-        else
-            m_bufferPos--;
+        const u16 k = m_buffer[m_bufferReadPos];
+        m_buffer[m_bufferReadPos] = 0;
 
-        const u16 k = m_buffer[m_bufferPos];
-        m_buffer[m_bufferPos] = 0;
+        m_bufferReadPos++;
+        if(m_bufferReadPos >= DCPU_GENERIC_KEYBOARD_BUFSIZE)
+            m_bufferReadPos = 0;
 
         return k;
     }
@@ -93,8 +92,12 @@ namespace dcpu
 
     bool Keyboard::isKeyPressed(u16 k)
     {
+        #if DCPU_DEBUG == 1
+        assert(r_input != 0);
+        #else
         if(r_input == 0)
             return false;
+        #endif
 
         bool res = false;
 
@@ -162,7 +165,8 @@ namespace dcpu
 
     void Keyboard::clearBuffer()
     {
-        m_bufferPos = 0;
+        m_bufferWritePos = 0;
+        m_bufferReadPos = 0;
         memset(m_buffer, 0, DCPU_GENERIC_KEYBOARD_BUFSIZE * sizeof(u16));
     }
 
@@ -180,6 +184,9 @@ namespace dcpu
         //   | disable interrupts
         //---+----------------------------------------------------------------------------
 
+        // Note for 2: this might be confusing because there is no
+        // dedicated keys for all characters
+
         if(r_dcpu == 0)
             return;
 
@@ -191,7 +198,7 @@ namespace dcpu
             break;
 
         case 1:
-            r_dcpu->setRegister(AD_C, popEvent());
+            r_dcpu->setRegister(AD_C, nextEvent());
             break;
 
         case 2:
