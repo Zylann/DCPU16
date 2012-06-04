@@ -10,33 +10,53 @@ using namespace dcpu;
 
 int main(int argc, char * argv[])
 {
+    std::cout << "Program begin" << std::endl;
+
     /* Handle command line arguments */
-    // TODO main: test input program filename
+
     std::string programFileName = "dasm/text_editor.dasm";
     if(argc == 2)
     {
         programFileName = argv[1];
+
+        /* Run emulator */
+
+        Emulator emulator;
+
+        if(!emulator.loadContent())
+            return -1;
+
+        if(emulator.loadProgram(programFileName))
+        {
+            emulator.dumpMemoryAsText("dump0.txt");
+            emulator.run();
+            emulator.dumpMemoryAsText("dump1.txt");
+        }
     }
-    else if(argc >= 2)
+    else if(argc == 4)
     {
-        std::cout << "E: Too much arguments." << std::endl;
-        return -1;
+        /* Convert image to DASM font */
+
+        std::string cmd = argv[1];
+        if(cmd == "-cvf")
+        {
+            std::string inputImageFilename = argv[2];
+            std::string outputFilename = argv[3];
+            convertImageToDASMFont(inputImageFilename, outputFilename);
+        }
+        else
+        {
+            std::cout << "E: unrecognized command, or syntax error." << std::endl;
+            return -1;
+        }
     }
-
-    std::cout << "Program begin" << std::endl;
-
-    /* Run emulator */
-
-    Emulator emulator;
-
-    if(!emulator.loadContent())
-        return -1;
-
-    if(emulator.loadProgram(programFileName))
+    else
     {
-        emulator.dumpMemoryAsText("dump0.txt");
-        emulator.run();
-        emulator.dumpMemoryAsText("dump1.txt");
+        /* Default: print help */
+
+        // TODO main: print help
+        std::cout << "E: bad arguments" << std::endl;
+        return -1;
     }
 
     std::cout << "Program end" << std::endl;
