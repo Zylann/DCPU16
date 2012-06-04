@@ -145,7 +145,8 @@ namespace dcpu
         // Expected clock frequency: 100kHz
         const u32 cycles0 = m_dcpu.getCycles();
         #if DCPU_DEBUG == 1
-        const u32 cycles1 = cycles0 + 100.f * m_win->GetFrameTime();
+        //const u32 cycles1 = cycles0 + 100.f * m_win->GetFrameTime();
+        const u32 cycles1 = cycles0 + DCPU_FREQUENCY * m_win->GetFrameTime();
         #else
         const u32 cycles1 = cycles0 + DCPU_FREQUENCY * m_win->GetFrameTime();
         #endif
@@ -220,6 +221,9 @@ namespace dcpu
         std::stringstream ss;
         ss << m_dcpu.getCycles();
         text += ss.str();
+
+        if(m_dcpu.getHaltCycles() > 0)
+            text += " on halt...";
 
         // Draw stuff
 
