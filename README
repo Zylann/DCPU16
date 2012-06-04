@@ -9,14 +9,16 @@ Current features
 	- DASM16 assembler
 	- Hardware commands
 	- Interrupts
-	- LEM1802 emulation (only supports the default font and palette)
+	- LEM1802 emulation (changing palette/border color is not supported yet)
 	- Generic Keyboard emulation
 	- CPU state display with an overlay by hitting TAB
 	- Auto textual memory dump before and after running
+	- Font image converter (image 128x32 ==> DASM code)
 
 Planned features
 
 	- More hardware devices (Generic clock, custom speakers...)
+	- Better support for implemented hardware devices
 	- Debug tools / disassembler
 	- IDE?
 
@@ -28,14 +30,21 @@ Compiling / dependencies
 	
 Releases
 
-	Not available for now, I will upload Linux binaries soon.
+	Not available for now, I should upload Linux binaries soon.
 	Windows binaries will come after for stable releases only.
 
 How to use
 
 	In the command line :
 	
-	dcpu yourFile	# will assemble yourFile and run it
-	dcpu			# will assemble and run a default file (print help later)
+	dcpu yourFile
+		# Will assemble yourFile and run it
+		
+	dcpu -cvf yourImage yourDASMFile
+		# Converts an font image (128x32 px) into DASM code (dat 0xstuff).
+		# fonts are read as white pixels.
+		
+	dcpu
+		# Prints an error (print help later)
 
 
