@@ -1,0 +1,89 @@
+;clock_test by Zylann
+
+	hwn j
+:detect_hardware
+	hwq i
+	ife 0x7349, b
+		ife 0xf615, a
+			set [display_int], i
+	ife 0x30cf, b
+		ife 0x7406, a
+			set [keyboard_int], i
+	ife 0x12d0, b
+		ife 0xb402, a
+			set [clock_int], i
+	add i, 1
+	ife i, j
+		set pc, init_screen
+	set pc, detect_hardware
+
+:init_screen
+	set b, [vram_addr]
+	set a, 0 ; MEM_MAP_SCREEN
+	hwi [display_int]
+
+:main
+	ias interrupt
+	set a, 0
+	set b, 60
+	hwi [clock_int]
+	set a, 2
+	set b, [clock_int]
+	hwi [clock_int]
+	:main_loop
+		set pc, main_loop
+
+:interrupt
+	set a, 1
+	hwi [clock_int]
+	set a, c
+	set b, [vram_addr]
+	set c, 0xf000
+	jsr printint
+	rfi
+
+:crash
+	set pc, crash
+
+;--------0xVars--------
+
+:display_int
+	dat 0xffff
+
+:keyboard_int
+	dat 0xffff
+
+:clock_int
+	dat 0xffff
+
+:vram_addr
+	dat 0x8000
+
+;--------0xLib--------
+
+:printint
+;a=value, b=dest, c=format
+	set push, a
+	set push, b
+	set push, x
+	add b, 5
+	:printint_loop
+		set x, a
+		mod x, 10
+		add x, 0x30
+		bor x, c
+		set [b], x
+		div a, 10
+		ife a, 0
+			set pc, printint_loop_end
+		sub b, 1
+		set pc, printint_loop
+	:printint_loop_end
+	set x, pop
+	set b, pop
+	set a, pop
+	set pc, pop
+
+
+
+
