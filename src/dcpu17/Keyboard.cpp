@@ -1,3 +1,4 @@
+#include <assert.h>
 #include "Keyboard.hpp"
 
 namespace dcpu
