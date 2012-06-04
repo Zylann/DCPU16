@@ -56,6 +56,7 @@ namespace dcpu
         // Connect devices
         m_lem.connect(m_dcpu);
         m_keyboard.connect(m_dcpu);
+        m_clock.connect(m_dcpu);
 
         // Video mode
         int ratio = 4;
@@ -89,6 +90,7 @@ namespace dcpu
 
             // Update hardware devices
             m_lem.update(delta);
+            m_clock.update(delta);
 
             // Process events
             while(m_win->GetEvent(event))
@@ -126,9 +128,11 @@ namespace dcpu
             m_win->Display();
         }
 
+        // Disconnect devices
         m_keyboard.setInput(0);
         m_keyboard.disconnect();
         m_lem.disconnect();
+        m_clock.disconnect();
 
         // Delete window
         if(m_win != 0)
