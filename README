@@ -28,6 +28,9 @@ Compiling / dependencies
 	
 	The project is compiled with GCC.
 	
+	Note: don't include src/dcpu11 to your project if you want to compile,
+		this directory contains an outdated version of the DCPU.
+	
 Releases
 
 	Not available for now, I should upload Linux binaries soon.
