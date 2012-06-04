@@ -241,6 +241,8 @@ namespace dcpu
             return true;
         }
 
+        // TODO Assembler: check the last interpreted character of a line to be ';' or a newline
+
         /* Label definition */
         // TODO Assembler: allow ":label <op stuff...>" syntax
 
