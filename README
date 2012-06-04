@@ -10,12 +10,13 @@ Current features
 	- Hardware commands
 	- Interrupts
 	- LEM1802 emulation (only supports the default font and palette)
+	- Generic Keyboard emulation
 	- CPU state display with an overlay by hitting TAB
 	- Auto textual memory dump before and after running
 
 Planned features
 
-	- More hardware devices
+	- More hardware devices (Generic clock, custom speakers...)
 	- Debug tools / disassembler
 	- IDE?
 
@@ -35,6 +36,6 @@ How to use
 	In the command line :
 	
 	dcpu yourFile	# will assemble yourFile and run it
-	dcpu			# will assemble and run cputest.dasm (default, should print help later)
+	dcpu			# will assemble and run a default file (print help later)
 
 
