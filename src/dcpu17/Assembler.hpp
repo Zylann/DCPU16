@@ -63,6 +63,8 @@ namespace dcpu
         {}
     };
 
+    // TODO Assembler: should use the new generic Parser
+
     class Assembler
     {
     private :
