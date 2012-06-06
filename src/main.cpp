@@ -35,14 +35,24 @@ int main(int argc, char * argv[])
     }
     else if(argc == 4)
     {
-        /* Convert image to DASM font */
-
         std::string cmd = argv[1];
         if(cmd == "-cvf")
         {
+            /* Convert image to DASM font */
+
             std::string inputImageFilename = argv[2];
             std::string outputFilename = argv[3];
-            convertImageToDASMFont(inputImageFilename, outputFilename);
+            if(!convertImageToDASMFont(inputImageFilename, outputFilename))
+                return -1;
+        }
+        else if(cmd == "-pp")
+        {
+            /* Preprocess a file */
+
+            programFileName = argv[2];
+            std::string outputFilename = argv[3];
+            if(!preprocessFile(programFileName, outputFilename))
+                return -1;
         }
         else
         {
