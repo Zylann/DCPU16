@@ -11,30 +11,36 @@ Current features
 	- Interrupts
 	- LEM1802 emulation (changing palette/border color is not supported yet)
 	- Generic Keyboard emulation
+	- Generic Clock emulation
 	- CPU state display with an overlay by hitting TAB
 	- Auto textual memory dump before and after running
 	- Font image converter (image 128x32 ==> DASM code)
+	- Basic preprocessor (only a 1-level #include is supported)
 
 Planned features
 
-	- More hardware devices (Generic clock, custom speakers...)
+	- Print help in command line
+	- N-level #include with infinite inclusion checking
+	- More preprocessor commands (#define etc...)
+	- More assembly special commands
+	- More hardware devices (Custom speakers?)
 	- Better support for implemented hardware devices
 	- Debug tools / disassembler
 	- IDE?
 
+Releases
+
+	Not available for now, I should upload Linux binaries soon.
+	Windows binaries will come after for stable releases only.
+
 Compiling / dependencies
-		
+	
 	SFML 1.6 : http://www.sfml-dev.org/index.php
 	
 	The project is compiled with GCC.
 	
 	Note: don't include src/dcpu11 to your project if you want to compile,
-		this directory contains an outdated version of the DCPU.
-	
-Releases
-
-	Not available for now, I should upload Linux binaries soon.
-	Windows binaries will come after for stable releases only.
+		this directory contains an outdated version of the emulator for 1.1 specs.
 
 How to use
 
@@ -43,11 +49,28 @@ How to use
 	dcpu yourFile
 		# Will assemble yourFile and run it
 		
+	dcpu -pp yourFile ouputFile
+		# Will perform a preprocessing pass to yourFile
+		# and put the result in outputFile.
+		# see detailed information about the preprocessor below.
+		
 	dcpu -cvf yourImage yourDASMFile
 		# Converts an font image (128x32 px) into DASM code (dat 0xstuff).
 		# fonts are read as white pixels.
+		# Supported image formats: BMP, PNG, JPG (not recommended) and a few others.
 		
 	dcpu
-		# Prints an error (print help later)
+		# Prints an error (should print help later)
+
+==================== More detailed info ========================================
+
+The preprocessor
+
+	#include "file"
+	; will copy the content of the given file at this position.
+	; Preprocessor commands in the included file are not processed yet.
+
+
+
 
 
