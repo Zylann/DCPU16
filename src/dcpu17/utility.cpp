@@ -3,9 +3,14 @@
 
 #include "utility.hpp"
 #include "Assembler.hpp"
+#include "Preprocessor.hpp"
 
 namespace dcpu
 {
+    /*
+        For DCPU
+    */
+
     bool convertImageToDASMFont(
         const std::string & inputFilename,
         const std::string & outputFilename)
@@ -85,37 +90,6 @@ namespace dcpu
         return true;
     }
 
-    char u4ToHexChar(u8 n)
-    {
-        n &= 0xf;
-        if(n < 10)
-            return '0' + n;
-        return 'a' + (n - 10);
-    }
-
-    void u16ToHexStr(u16 n, char str[4])
-    {
-        u16 m = 0x8000; // bit mask 1000 0000 0000 0000
-        u8 d = 0;
-        u8 di = 0;
-
-        for(u8 i = 0; i < 16; i++)
-        {
-            if((n & m) != 0)
-                d |= 1;
-
-            if((i+1) % 4 == 0)
-            {
-                str[di] = u4ToHexChar(d);
-                d = 0;
-                di++;
-            }
-
-            m >>= 1;
-            d <<= 1;
-        }
-    }
-
     bool loadProgram(DCPU & cpu, const std::string & filename)
     {
         std::ifstream ifs(filename.c_str(), std::ios::binary|std::ios::in);
@@ -175,6 +149,76 @@ namespace dcpu
         ofs.close();
         return true;
     }
+
+    bool preprocessFile(
+        const std::string & inputFilename,
+        const std::string & outputFilename)
+    {
+        std::ifstream ifs(inputFilename.c_str(), std::ios::in|std::ios::binary);
+        if(!ifs.good())
+        {
+            std::cout << "E: couldn't open file '"
+                << inputFilename << "'" << std::endl;
+            return false;
+        }
+
+        std::ofstream ofs(outputFilename.c_str(),
+            std::ios::out|std::ios::trunc|std::ios::binary);
+        if(!ofs.good())
+        {
+            std::cout << "E: couldn't create file '"
+                << outputFilename << "'" << std::endl;
+            return false;
+        }
+
+        Preprocessor preprocessor(ifs, ofs);
+        if(!preprocessor.process())
+        {
+            std::cout << "E: Preprocessor: "
+                << preprocessor.getExceptionString() << std::endl;
+            return false;
+        }
+
+        ifs.close();
+        ofs.close();
+        return true;
+    }
+
+    /*
+        General purpose
+    */
+
+    char u4ToHexChar(u8 n)
+    {
+        n &= 0xf;
+        if(n < 10)
+            return '0' + n;
+        return 'a' + (n - 10);
+    }
+
+    void u16ToHexStr(u16 n, char str[4])
+    {
+        u16 m = 0x8000; // bit mask 1000 0000 0000 0000
+        u8 d = 0;
+        u8 di = 0;
+
+        for(u8 i = 0; i < 16; i++)
+        {
+            if((n & m) != 0)
+                d |= 1;
+
+            if((i+1) % 4 == 0)
+            {
+                str[di] = u4ToHexChar(d);
+                d = 0;
+                di++;
+            }
+
+            m >>= 1;
+            d <<= 1;
+        }
+    }
+
 
 } // namespace dcpu
 

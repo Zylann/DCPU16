@@ -16,20 +16,33 @@
 
 namespace dcpu
 {
-    /* For DCPU */
+    /*
+        For DCPU
+    */
 
     // Loads, assembles and installs a DCPU program
+    // Returns false if an error occurred.
     bool loadProgram(DCPU & cpu, const std::string & filename);
 
     // Dumps DCPU memory to a file
+    // Returns false if an error occurred.
     bool dumpAsText(DCPU & cpu, const std::string & filename);
 
     // Converts an image to DASM "DAT" font code
+    // Returns false if an error occurred.
     bool convertImageToDASMFont(
         const std::string & inputFilename,
         const std::string & outputFilename);
 
-    /* General purpose */
+    // Performs a preprocessing pass on a file, then saves the result in another file.
+    // Returns false if an error occurred.
+    bool preprocessFile(
+        const std::string & inputFilename,
+        const std::string & outputFilename);
+
+    /*
+        General purpose
+    */
 
     // Clears the console
     inline void clearConsole()
@@ -83,6 +96,7 @@ namespace dcpu
                 c == 'o' || c == 'u' || c == 'y';
     }
 
+    // Interprets an unsigned number as a signed number
     inline s32 toSigned(u16 n)
     {
         return n & 0x8000 ? n - 0x10000 : n;
