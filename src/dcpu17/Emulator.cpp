@@ -6,7 +6,7 @@
 #define DCPU_FRAMERATE 60
 #define DCPU_SCREEN_W DCPU_LEM1802_W
 #define DCPU_SCREEN_H DCPU_LEM1802_H
-#define DCPU_FREQUENCY 100000.f
+#define DCPU_EMU_FREQUENCY DCPU_STANDARD_FREQUENCY
 
 namespace dcpu
 {
@@ -134,7 +134,7 @@ void Emulator::updateCPU()
 
 	// Expected clock frequency: 100kHz
 	const u32 cycles0 = m_dcpu.getCycles();
-	const u32 cycles1 = cycles0 + DCPU_FREQUENCY * frameTime;
+	const u32 cycles1 = cycles0 + DCPU_EMU_FREQUENCY * frameTime;
 
 	while(m_dcpu.getCycles() < cycles1)
 	{
@@ -147,7 +147,7 @@ void Emulator::updateCPU()
 void Emulator::drawCPUState()
 {
 	std::string text;
-	char hex[4] = {'0'};
+	char hex[5] = {'0','0','0','0', 0};
 
 	// Registers
 

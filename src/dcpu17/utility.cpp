@@ -7,15 +7,15 @@
 
 namespace dcpu
 {
-/*
-	For DCPU
-*/
+// -----------------------------------------------------------------------------
+// DCPU utility
+// -----------------------------------------------------------------------------
 
 bool convertImageToDASMFont(
 	const std::string & inputFilename,
 	const std::string & outputFilename)
 {
-	/* Load image */
+	// Load image
 	sf::Image img;
 	if(!img.loadFromFile(inputFilename))
 	{
@@ -24,19 +24,19 @@ bool convertImageToDASMFont(
 		return false;
 	}
 
-	/* Check image */
+	// Check image
 	if(img.getSize().x < 128 || img.getSize().y < 32)
 	{
 		std::cout << "E: The input image is too small." << std::endl;
 		return false;
 	}
 
-	/* Create output file */
+	// Create output file
 	std::ofstream ofs(
 		outputFilename.c_str(),
 		std::ios::out|std::ios::binary|std::ios::trunc);
 
-	/* Check output file */
+	// Check output file
 	if(!ofs.good())
 	{
 		std::cout << "E: Couldn't create file '"
@@ -45,13 +45,15 @@ bool convertImageToDASMFont(
 		return false;
 	}
 
-	/* Convert */
+	//
+	// Convert
+	//
 
 	u16 cx, cy, k = 0;
 	char hex[4] = {'0'};
 	// For each glyph
-	for(cy = 0; cy < 4; cy++)
-	for(cx = 0; cx < 32; cx++, k++)
+	for(cy = 0; cy < 4; ++cy)
+	for(cx = 0; cx < 32; ++cx, ++k)
 	{
 		// Glyph pos in pixels
 		u16 x = cx * 4;
@@ -96,7 +98,7 @@ bool loadProgram(DCPU & cpu, const std::string & filename)
 	if(!ifs.good())
 	{
 		ifs.close();
-		std::cout << "Error: cannot open file '" << filename << "'" << std::endl;
+		std::cout << "E: cannot open file '" << filename << "'" << std::endl;
 		return false;
 	}
 
@@ -105,7 +107,7 @@ bool loadProgram(DCPU & cpu, const std::string & filename)
 	bool res = assembler.assembleStream(ifs);
 	if(!res)
 	{
-		std::cout << "Error: " << assembler.getExceptionString() << std::endl;
+		std::cout << "E: " << assembler.getExceptionString() << std::endl;
 		std::cout << "Assembling failed." << std::endl;
 	}
 	else
@@ -124,14 +126,14 @@ bool dumpAsText(DCPU & cpu, const std::string & filename)
 	if(!ofs.good())
 	{
 		ofs.close();
-		std::cout << "Error: cannot create file '" << filename << "'" << std::endl;
+		std::cout << "E: cannot create file '" << filename << "'" << std::endl;
 		return false;
 	}
 
 	std::cout << "Dumping CPU memory..." << std::endl;
 
-	char str[4];
-	for(u32 i = 0; i < DCPU_RAM_SIZE; i++)
+	char str[5] = {'0', '0', '0', '0', 0};
+	for(u32 i = 0; i < DCPU_RAM_SIZE; ++i)
 	{
 		if(i % 8 == 0)
 		{
@@ -184,9 +186,9 @@ bool preprocessFile(
 	return true;
 }
 
-/*
-	General purpose
-*/
+// -----------------------------------------------------------------------------
+//	General purpose
+// -----------------------------------------------------------------------------
 
 char u4ToHexChar(u8 n)
 {
@@ -218,7 +220,6 @@ void u16ToHexStr(u16 n, char str[4])
 		d <<= 1;
 	}
 }
-
 
 } // namespace dcpu
 

@@ -1,5 +1,5 @@
-#ifndef DCPUCOMMON_HPP_INCLUDED
-#define DCPUCOMMON_HPP_INCLUDED
+#ifndef HEADER_DCPUCOMMON_HPP_INCLUDED
+#define HEADER_DCPUCOMMON_HPP_INCLUDED
 
 // Enable debug messages
 #define DCPU_DEBUG
@@ -19,6 +19,6 @@ namespace dcpu
     typedef signed long s64;
 }
 
-#endif // DCPUCOMMON_HPP_INCLUDED
+#endif // HEADER_DCPUCOMMON_HPP_INCLUDED
 
 

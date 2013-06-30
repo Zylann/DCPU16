@@ -20,7 +20,7 @@
 	SET B, [screen_pos]
 	SET A, 0
 	HWI [display_int]
-	
+
 :splash
 	set push, a
 	set push, b
@@ -54,7 +54,7 @@
 	set b, pop
 	set a, pop
 	set pc, main_loop
-		
+
 :sleep
 ;a=counter
 	set push, a

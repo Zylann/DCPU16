@@ -24,16 +24,16 @@ void DCPU::setMemory(const u16 ram[DCPU_RAM_SIZE])
 		m_ram[i] = ram[i];
 }
 
-// Numbers from 0x00 to 0x1f
-static u16 lit[0x20] = {
+// Numbers from -1 to 30
+static u16 g_lit[0x20] = { 0xffff,
 	0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
 	0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
 	0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17,
-	0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f
+	0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e
 };
 
 // Base cost of basic operations
-static u32 opCost[OP_COUNT] = {
+static u32 g_opCost[OP_COUNT] = {
 	0, // 0x00
 	1, // 0x01 SET
 	2, // 0x02 ADD
@@ -69,7 +69,7 @@ static u32 opCost[OP_COUNT] = {
 };
 
 // Base cost of non-basic operations
-static u32 eopCost[EOP_COUNT] = {
+static u32 g_eopCost[EOP_COUNT] = {
 	0, // 0x00
 	3, // 0x01 JSR
 	0, // 0x02
@@ -120,12 +120,12 @@ u16 * DCPU::operand(u16 code, bool isB)
 	// [Register + [PC++]] (reg + nextword)
 	case 0x10: case 0x11: case 0x12: case 0x13:
 	case 0x14: case 0x15: case 0x16: case 0x17:
-		m_cycles++;
+		++m_cycles;
 		return m_ram + ((m_r[code & 7] + m_ram[m_pc++]) & 0xffff);
 
 	// (PUSH / [--SP]) if in b, or (POP / [SP++]) if in a
 	case 0x18:
-		m_cycles++;
+		++m_cycles;
 		if(isB)
 			return m_ram + (--m_sp); // PUSH
 		else
@@ -135,7 +135,7 @@ u16 * DCPU::operand(u16 code, bool isB)
 		return m_ram + m_sp;
 	// [SP + next word] (PICK n)
 	case 0x1a:
-		m_cycles++;
+		++m_cycles;
 		return m_ram + ((m_sp + m_ram[m_pc++]) & 0xffff);
 	// SP
 	case 0x1b:
@@ -154,7 +154,7 @@ u16 * DCPU::operand(u16 code, bool isB)
 		return m_ram + m_pc++;
 
 	default: // 0x20-0x3f
-		return lit + (code & 0x1f);
+		return g_lit + (code & 0x1f);
 	}
 }
 
@@ -167,17 +167,17 @@ void DCPU::skip(bool fromIF)
 	if(isBasicOp(op))
 	{
 		if(isOperandAdvancePC(decodeA(op)))
-			m_pc++;
+			++m_pc;
 		if(isOperandAdvancePC(decodeB(op)))
-			m_pc++;
+			++m_pc;
 	}
 	else
 	{
 		if(isOperandAdvancePC(decodeExA(op)))
-			m_pc++;
+			++m_pc;
 	}
 
-	m_cycles++;
+	++m_cycles;
 
 	if(fromIF)
 	{
@@ -192,15 +192,15 @@ void DCPU::skip(bool fromIF)
 // Executes one instruction
 void DCPU::step()
 {
-	m_steps++;
+	++m_steps;
 
 	if(m_broken)
 		return;
 
 	if(m_haltCycles > 0)
 	{
-		m_haltCycles--;
-		m_cycles++;
+		--m_haltCycles;
+		++m_cycles;
 		return;
 	}
 
@@ -239,7 +239,9 @@ void DCPU::basicOp(u16 op)
 
 	u8 opcode = decodeOp(op);
 	s32 res = 0;
-	m_cycles += opCost[opcode];
+	m_cycles += g_opCost[opcode];
+
+	//std::cout << (u32)opcode << std::endl;
 
 	switch (opcode)
 	{
@@ -264,7 +266,7 @@ void DCPU::basicOp(u16 op)
 
 	case OP_MLI:
 		// like MUL, but treat b, a as signed
-		res = toSigned(b) * toSigned(a);
+		res = asSigned(b) * asSigned(a);
 		m_ex = res >> 16;
 		break;
 
@@ -281,8 +283,8 @@ void DCPU::basicOp(u16 op)
 	case OP_DVI:
 		if(a)
 		{
-			res = toSigned(b) * toSigned(a);
-			m_ex = ((toSigned(b) << 16) / toSigned(a)) & 0xffff;
+			res = asSigned(b) * asSigned(a);
+			m_ex = ((asSigned(b) << 16) / asSigned(a)) & 0xffff;
 		}
 		else
 			m_ex = 0;
@@ -295,7 +297,7 @@ void DCPU::basicOp(u16 op)
 
 	case OP_MDI:
 		if(a)
-			res = toSigned(b) % toSigned(a);
+			res = asSigned(b) % asSigned(a);
 		break;
 
 	case OP_SHL:
@@ -314,8 +316,8 @@ void DCPU::basicOp(u16 op)
 		// on what type of integer is being shifted;
 		// often signed integers are shifted using the arithmetic shift,
 		// and unsigned integers are shifted using the logical shift.
-		res = toSigned(b) >> a;
-		m_ex = (toSigned(b) << 16) >> a;
+		res = asSigned(b) >> a;
+		m_ex = (asSigned(b) << 16) >> a;
 		break;
 
 	case OP_SHR:
@@ -363,7 +365,7 @@ void DCPU::basicOp(u16 op)
 		return;
 
 	case OP_IFU:
-		if(toSigned(b) >= toSigned(a))
+		if(asSigned(b) >= asSigned(a))
 			skip(true);
 		return;
 
@@ -373,7 +375,7 @@ void DCPU::basicOp(u16 op)
 		return;
 
 	case OP_IFA:
-		if(toSigned(b) <= toSigned(a))
+		if(asSigned(b) <= asSigned(a))
 			skip(true);
 		return;
 
@@ -422,7 +424,7 @@ void DCPU::extendedOp(u16 op)
 	u16 a = *a_addr;
 	u8 exOpcode = decodeExOp(op);
 
-	m_cycles += eopCost[exOpcode];
+	m_cycles += g_eopCost[exOpcode];
 
 	switch (exOpcode)
 	{
@@ -484,9 +486,9 @@ void DCPU::extendedOp(u16 op)
 		}
 		else
 		{
-			#ifdef DCPU_DEBUG
+#ifdef DCPU_DEBUG
 			std::cout << "E: Failed to read HD info (" << a << ") " << std::endl;
-			#endif
+#endif
 			m_r[AD_A] = 0;
 			m_r[AD_B] = 0;
 			m_r[AD_C] = 0;
@@ -499,19 +501,19 @@ void DCPU::extendedOp(u16 op)
 		// Sends an interrupt to hardware a
 		if(a < m_hardwareDevices.size())
 			m_hardwareDevices[a]->interrupt();
-		#ifdef DCPU_DEBUG
+#ifdef DCPU_DEBUG
 		else
 			std::cout << "E: Failed to send an interrupt to HD ("
 				<< a << "), which is not connected." << std::endl;
-		#endif
+#endif
 		return;
 
 	default:
-		#ifdef DCPU_DEBUG
+#ifdef DCPU_DEBUG
 		std::cout << "E: Unknown ex. opcode (" << (u32)exOpcode << ")"
 			<< " at address " << (u32)m_pc << std::endl;
 		setBroken(true);
-		#endif
+#endif
 		return;
 	}
 }
@@ -533,9 +535,9 @@ void DCPU::interrupt(u16 msg)
 	else
 	{
 		// Perform interrupt
-		#ifdef DCPU_DEBUG
+#ifdef DCPU_DEBUG
 		std::cout << "I: Interrupt triggered (" << (int)msg << ")" << std::endl;
-		#endif
+#endif
 		m_intQueueing = true;
 		m_ram[--m_sp] = m_pc;
 		m_ram[--m_sp] = m_r[AD_A];
@@ -557,9 +559,9 @@ bool DCPU::pushInterrupt(u16 msg)
 
 	if(m_intQueuePos == DCPU_INTQ_SIZE)
 	{
-		#ifdef DCPU_DEBUG
+#ifdef DCPU_DEBUG
 		std::cout << "E: Interrupts queue overflow" << std::endl;
-		#endif
+#endif
 		setBroken(true);
 		return false;
 	}
@@ -579,7 +581,7 @@ bool DCPU::popInterrupt(u16 & msg)
 	if(m_intQueuePos == 0)
 		m_intQueueEmpty = true;
 	else
-		m_intQueuePos--;
+		--m_intQueuePos;
 
 	return true;
 }
@@ -590,12 +592,12 @@ u16 DCPU::connectHardware(IHardwareDevice * hd)
 {
 	if(m_hardwareDevices.size() == DCPU_MAX_HD)
 	{
-		#ifdef DCPU_DEBUG
+#ifdef DCPU_DEBUG
 		std::cout << "E: can't connect another hardware device, limit has been reached" << std::endl;
-		#endif
+#endif
 		return m_hardwareDevices.size();
 	}
-	for(u16 i = 0; i < m_hardwareDevices.size(); i++)
+	for(u16 i = 0; i < m_hardwareDevices.size(); ++i)
 	{
 		if(m_hardwareDevices[i] == hd)
 			return i;
@@ -608,7 +610,7 @@ u16 DCPU::connectHardware(IHardwareDevice * hd)
 void DCPU::disconnectHardware(IHardwareDevice * hd)
 {
 	u16 i;
-	for(i = 0; i < m_hardwareDevices.size(); i++)
+	for(i = 0; i < m_hardwareDevices.size(); ++i)
 	{
 		if(m_hardwareDevices[i] == hd)
 			break;

@@ -221,12 +221,8 @@ void LEM1802::update(float delta)
 
 void LEM1802::render(sf::RenderWindow & win)
 {
-#ifdef DCPU_DEBUG
-	assert(r_dcpu != 0);
-#else
 	if(r_dcpu == 0)
 		return;
-#endif
 
 	if(m_vramAddr == 0)
 		return;

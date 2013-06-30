@@ -1,5 +1,5 @@
-#ifndef EMULATOR_HPP_INCLUDED
-#define EMULATOR_HPP_INCLUDED
+#ifndef HEADER_EMULATOR_HPP_INCLUDED
+#define HEADER_EMULATOR_HPP_INCLUDED
 
 #include <SFML/Graphics.hpp>
 
@@ -7,10 +7,6 @@
 #include "LEM1802.hpp"
 #include "Keyboard.hpp"
 #include "Clock.hpp"
-
-// Old DCPU standards
-//#define DCPU11_VRAM_START 0x8000 // Video
-//#define DCPU11_KBRAM_START 0x9000 // Keyboard
 
 namespace dcpu
 {
@@ -80,4 +76,4 @@ private :
 
 } // namespace dcpu
 
-#endif // EMULATOR_HPP_INCLUDED
+#endif // HEADER_EMULATOR_HPP_INCLUDED
