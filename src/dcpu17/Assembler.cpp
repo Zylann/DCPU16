@@ -3,18 +3,9 @@
 #include "Assembler.hpp"
 #include "utility.hpp"
 
-#define addBasicOpcode(__name, __code) \
-    m_basicOpcodes.insert(std::pair<std::string,u16>(__name,__code))
-
-#define addExtendedOpcode(__name, __code) \
-    m_extendedOpcodes.insert(std::pair<std::string,u16>(__name,__code))
-
 // TODO Assembler: set an exception if we define a label from a reserved name
 #define addLabel(__name, __addr) \
     m_labels.insert(std::pair<std::string,u16>(__name, __addr)).second
-
-#define addVariable(__name, __var) \
-    m_variables.insert(std::pair<std::string,Variable>(__name, __var))
 
 #define CHECK_END_OF_LINE \
     if(m_pos >= m_line.size()) { \
@@ -56,63 +47,63 @@ Assembler::Assembler()
 	init();
 
 	// Basic opcodes
-	addBasicOpcode("SET", OP_SET);
-	addBasicOpcode("ADD", OP_ADD);
-	addBasicOpcode("SUB", OP_SUB);
-	addBasicOpcode("MUL", OP_MUL);
-	addBasicOpcode("MLI", OP_MLI);
-	addBasicOpcode("DIV", OP_DIV);
-	addBasicOpcode("DVI", OP_DVI);
-	addBasicOpcode("MOD", OP_MOD);
-	addBasicOpcode("MDI", OP_MDI);
-	addBasicOpcode("SHL", OP_SHL);
-	addBasicOpcode("ASR", OP_ASR);
-	addBasicOpcode("SHR", OP_SHR);
-	addBasicOpcode("AND", OP_AND);
-	addBasicOpcode("BOR", OP_BOR);
-	addBasicOpcode("XOR", OP_XOR);
-	addBasicOpcode("IFC", OP_IFC);
-	addBasicOpcode("IFA", OP_IFA);
-	addBasicOpcode("IFE", OP_IFE);
-	addBasicOpcode("IFN", OP_IFN);
-	addBasicOpcode("IFG", OP_IFG);
-	addBasicOpcode("IFB", OP_IFB);
-	addBasicOpcode("IFL", OP_IFL);
-	addBasicOpcode("IFU", OP_IFU);
-	addBasicOpcode("ADX", OP_ADX);
-	addBasicOpcode("SBX", OP_SBX);
-	addBasicOpcode("STI", OP_STI);
-	addBasicOpcode("STD", OP_STD);
+	m_basicOpcodes["SET"] = OP_SET;
+	m_basicOpcodes["ADD"] = OP_ADD;
+	m_basicOpcodes["SUB"] = OP_SUB;
+	m_basicOpcodes["MUL"] = OP_MUL;
+	m_basicOpcodes["MLI"] = OP_MLI;
+	m_basicOpcodes["DIV"] = OP_DIV;
+	m_basicOpcodes["DVI"] = OP_DVI;
+	m_basicOpcodes["MOD"] = OP_MOD;
+	m_basicOpcodes["MDI"] = OP_MDI;
+	m_basicOpcodes["SHL"] = OP_SHL;
+	m_basicOpcodes["ASR"] = OP_ASR;
+	m_basicOpcodes["SHR"] = OP_SHR;
+	m_basicOpcodes["AND"] = OP_AND;
+	m_basicOpcodes["BOR"] = OP_BOR;
+	m_basicOpcodes["XOR"] = OP_XOR;
+	m_basicOpcodes["IFC"] = OP_IFC;
+	m_basicOpcodes["IFA"] = OP_IFA;
+	m_basicOpcodes["IFE"] = OP_IFE;
+	m_basicOpcodes["IFN"] = OP_IFN;
+	m_basicOpcodes["IFG"] = OP_IFG;
+	m_basicOpcodes["IFB"] = OP_IFB;
+	m_basicOpcodes["IFL"] = OP_IFL;
+	m_basicOpcodes["IFU"] = OP_IFU;
+	m_basicOpcodes["ADX"] = OP_ADX;
+	m_basicOpcodes["SBX"] = OP_SBX;
+	m_basicOpcodes["STI"] = OP_STI;
+	m_basicOpcodes["STD"] = OP_STD;
 
 	// Non-basic opcodes
-	addExtendedOpcode("JSR", EOP_JSR);
-	addExtendedOpcode("INT", EOP_INT);
-	addExtendedOpcode("IAG", EOP_IAG);
-	addExtendedOpcode("IAS", EOP_IAS);
-	addExtendedOpcode("RFI", EOP_RFI);
-	addExtendedOpcode("IAQ", EOP_IAQ);
-	addExtendedOpcode("HWN", EOP_HWN);
-	addExtendedOpcode("HWQ", EOP_HWQ);
-	addExtendedOpcode("HWI", EOP_HWI);
+	m_extendedOpcodes["JSR"] = EOP_JSR;
+	m_extendedOpcodes["INT"] = EOP_INT;
+	m_extendedOpcodes["IAG"] = EOP_IAG;
+	m_extendedOpcodes["IAS"] = EOP_IAS;
+	m_extendedOpcodes["RFI"] = EOP_RFI;
+	m_extendedOpcodes["IAQ"] = EOP_IAQ;
+	m_extendedOpcodes["HWN"] = EOP_HWN;
+	m_extendedOpcodes["HWQ"] = EOP_HWQ;
+	m_extendedOpcodes["HWI"] = EOP_HWI;
 
 	// Registers
-	addVariable("A", Variable(AD_A, true));
-	addVariable("B", Variable(AD_B, true));
-	addVariable("C", Variable(AD_C, true));
-	addVariable("X", Variable(AD_X, true));
-	addVariable("Y", Variable(AD_Y, true));
-	addVariable("Z", Variable(AD_Z, true));
-	addVariable("I", Variable(AD_I, true));
-	addVariable("J", Variable(AD_J, true));
+	m_variables["A"] = Variable(AD_A, true);
+	m_variables["B"] = Variable(AD_B, true);
+	m_variables["C"] = Variable(AD_C, true);
+	m_variables["X"] = Variable(AD_X, true);
+	m_variables["Y"] = Variable(AD_Y, true);
+	m_variables["Z"] = Variable(AD_Z, true);
+	m_variables["I"] = Variable(AD_I, true);
+	m_variables["J"] = Variable(AD_J, true);
 
 	// Other variables
-	addVariable("PUSH", Variable(AD_PUSH_POP));
-	addVariable("POP", Variable(AD_PUSH_POP));
-	addVariable("PEEK", Variable(AD_PEEK));
-	addVariable("PICK", Variable(AD_PICK));
-	addVariable("SP", Variable(AD_SP));
-	addVariable("PC", Variable(AD_PC));
-	addVariable("EX", Variable(AD_EX));
+	m_variables["PUSH"] = Variable(AD_PUSH_POP);
+	m_variables["POP"] =  Variable(AD_PUSH_POP);
+	m_variables["PEEK"] = Variable(AD_PEEK);
+	m_variables["PICK"] = Variable(AD_PICK);
+	m_variables["SP"] =   Variable(AD_SP);
+	m_variables["PC"] =   Variable(AD_PC);
+	m_variables["EX"] =   Variable(AD_EX);
 }
 
 // Resets the assembler and leaves it ready to process a new stream
@@ -132,14 +123,6 @@ void Assembler::init()
 
 bool Assembler::skipWhiteSpace()
 {
-//        #ifdef DCPU_DEBUG
-//        std::cout << "Skipping whitespace : ";
-//        if(m_pos < m_line.size())
-//            std::cout << "'" << m_line[m_pos] << "'";
-//        else
-//            std::cout << "eof";
-//        #endif
-
 	while(m_pos < m_line.size())
 	{
 		if(isWhiteSpace(m_line[m_pos]))
@@ -147,15 +130,6 @@ bool Assembler::skipWhiteSpace()
 		else
 			break;
 	}
-
-//        #ifdef DCPU_DEBUG
-//        std::cout << "..";
-//        if(m_pos < m_line.size())
-//            std::cout << "'" << m_line[m_pos] << "'";
-//        else
-//            std::cout << "eof";
-//        std::cout << std::endl;
-//        #endif
 
 	return m_pos < m_line.size();
 }
@@ -584,7 +558,7 @@ bool Assembler::parseU16(u16 & value)
 
 	if(m_pos + 1 >= m_line.size())
 	{
-		// Zero value
+		// One decimal digit
 		value = m_line[m_pos] - '0';
 		return true;
 	}
@@ -905,6 +879,14 @@ bool Assembler::assembleLabels()
 #ifdef DCPU_DEBUG
 	std::cout << "Assembling labels..." << std::endl;
 #endif
+
+	if(m_labelUses.empty())
+	{
+#ifdef DCPU_DEBUG
+		std::cout << "No labels." << std::endl;
+		return true;
+#endif // DCPU_DEBUG
+	}
 
 	std::map<std::string, std::list<LabelUse> >::iterator usesIt;
 	std::map<std::string, u16>::iterator labelIt;
