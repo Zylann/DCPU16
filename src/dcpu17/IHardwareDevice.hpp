@@ -5,15 +5,17 @@
 
 namespace dcpu
 {
-    class IHardwareDevice
-    {
-    public :
+class IHardwareDevice
+{
+public :
 
-        virtual u32 getHID() const = 0;
-        virtual u16 getVersion() const = 0;
-        virtual u32 getManufacturerID() const = 0;
-        virtual void interrupt() = 0;
-    };
+	virtual ~IHardwareDevice() {}
+
+	virtual u32 getHID() const = 0;
+	virtual u16 getVersion() const = 0;
+	virtual u32 getManufacturerID() const = 0;
+	virtual void interrupt() = 0;
+};
 
 } // namespace dcpu
 

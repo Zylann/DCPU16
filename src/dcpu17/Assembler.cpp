@@ -149,7 +149,7 @@ namespace dcpu
 
     bool Assembler::skipWhiteSpace()
     {
-//        #if DCPU_DEBUG == 1
+//        #ifdef DCPU_DEBUG
 //        std::cout << "Skipping whitespace : ";
 //        if(m_pos < m_line.size())
 //            std::cout << "'" << m_line[m_pos] << "'";
@@ -165,7 +165,7 @@ namespace dcpu
                 break;
         }
 
-//        #if DCPU_DEBUG == 1
+//        #ifdef DCPU_DEBUG
 //        std::cout << "..";
 //        if(m_pos < m_line.size())
 //            std::cout << "'" << m_line[m_pos] << "'";
@@ -205,7 +205,7 @@ namespace dcpu
                     line += c;
             }
 
-            #if DCPU_DEBUG == 1
+            #ifdef DCPU_DEBUG
             std::cout << "\nAssembling line " << m_row << "..." << std::endl;
             std::cout << "'" << line << "'" << std::endl;
             #endif
@@ -235,7 +235,7 @@ namespace dcpu
 
         if(m_line[m_pos] == ';')
         {
-            #if DCPU_DEBUG == 1
+            #ifdef DCPU_DEBUG
             std::cout << "Skipping comment..." << std::endl;
             #endif
             return true;
@@ -248,7 +248,7 @@ namespace dcpu
 
         if(m_line[m_pos] == ':')
         {
-            #if DCPU_DEBUG == 1
+            #ifdef DCPU_DEBUG
             std::cout << "Label definition..." << std::endl;
             #endif
             m_pos++;
@@ -276,7 +276,7 @@ namespace dcpu
 
         strToUpper(opname);
 
-        #if DCPU_DEBUG == 1
+        #ifdef DCPU_DEBUG
         std::cout << "Opname : " << opname << " : ";
         #endif
 
@@ -285,7 +285,7 @@ namespace dcpu
         std::map<std::string,u16>::iterator it = m_basicOpcodes.find(opname);
         if(it != m_basicOpcodes.end())
         {
-            #if DCPU_DEBUG == 1
+            #ifdef DCPU_DEBUG
             std::cout << "Basic operation" << std::endl;
             #endif
             u16 opcode = it->second;
@@ -317,7 +317,7 @@ namespace dcpu
         it = m_extendedOpcodes.find(opname);
         if(it != m_extendedOpcodes.end())
         {
-            #if DCPU_DEBUG == 1
+            #ifdef DCPU_DEBUG
             std::cout << "Non-basic operation" << std::endl;
             #endif
             u16 opcode = it->second;
@@ -335,7 +335,7 @@ namespace dcpu
 
         /* Assembly operation */
 
-        #if DCPU_DEBUG == 1
+        #ifdef DCPU_DEBUG
         std::cout << "Assembly operation" << std::endl;
         #endif
         if(opname == "DAT")
@@ -360,7 +360,7 @@ namespace dcpu
         if(isdigit(c))
         {
             // Value
-            #if DCPU_DEBUG == 1
+            #ifdef DCPU_DEBUG
             std::cout << "Found value" << std::endl;
             #endif
             // TODO Assembler: parse expressions like 10+6*32/4 etc...
@@ -388,7 +388,7 @@ namespace dcpu
             if(it != m_variables.end())
             {
                 // Variable
-                #if DCPU_DEBUG == 1
+                #ifdef DCPU_DEBUG
                 std::cout << "Found variable" << std::endl;
                 #endif
                 op.value = it->second.addr;
@@ -397,7 +397,7 @@ namespace dcpu
             else
             {
                 // Label
-                #if DCPU_DEBUG == 1
+                #ifdef DCPU_DEBUG
                 std::cout << "Found label" << std::endl;
                 #endif
                 LabelUse u;
@@ -419,7 +419,7 @@ namespace dcpu
 
     bool Assembler::parseNextOperand(Operand & op)
     {
-        #if DCPU_DEBUG == 1
+        #ifdef DCPU_DEBUG
         std::cout << "Parsing next operand..." << std::endl;
         #endif
 
@@ -431,7 +431,7 @@ namespace dcpu
         {
             // Lookup
 
-            #if DCPU_DEBUG == 1
+            #ifdef DCPU_DEBUG
             std::cout << "Found '['" << std::endl;
             #endif
 
@@ -448,7 +448,7 @@ namespace dcpu
 
             if(m_line[m_pos] == '+')
             {
-                #if DCPU_DEBUG == 1
+                #ifdef DCPU_DEBUG
                 std::cout << "Found '+'" << std::endl;
                 #endif
                 // Syntax of [nextword + register]
@@ -729,7 +729,7 @@ namespace dcpu
             char c = m_line[m_pos];
             if(c == '"')
             {
-                #if DCPU_DEBUG == 1
+                #ifdef DCPU_DEBUG
                 std::cout << "Found string" << std::endl;
                 #endif
                 // String
@@ -738,7 +738,7 @@ namespace dcpu
             }
             else if(isdigit(c))
             {
-                #if DCPU_DEBUG == 1
+                #ifdef DCPU_DEBUG
                 std::cout << "Found word" << std::endl;
                 #endif
                 // Word
@@ -904,7 +904,7 @@ namespace dcpu
     // write label adresses where they are needed
     bool Assembler::assembleLabels()
     {
-        #if DCPU_DEBUG == 1
+        #ifdef DCPU_DEBUG
         std::cout << "Assembling labels..." << std::endl;
         #endif
 

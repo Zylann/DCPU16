@@ -55,9 +55,9 @@ namespace dcpu
         {
             if(m_is.eof())
                 return false;
-            #if DCPU_DEBUG == 1
+#ifdef DCPU_DEBUG
             std::cout << "Skipping line..." << std::endl;
-            #endif
+#endif
             nextLine();
         }
         return true;
@@ -72,9 +72,9 @@ namespace dcpu
         {
             if(isEndOfLine(c))
             {
-                #ifdef WINDOWS // CR+LF
+#ifdef WINDOWS // CR+LF
                 m_is.get(); // skip the LF
-                #endif
+#endif
                 return true;
             }
             c = m_is.get();

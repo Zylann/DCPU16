@@ -13,39 +13,42 @@
 
 namespace dcpu
 {
-    class Keyboard : public HardwareDevice
-    {
-    private :
 
-        u16 m_buffer[DCPU_GENERIC_KEYBOARD_BUFSIZE]; // cyclic buffer
-        u16 m_bufferWritePos;
-        u16 m_bufferReadPos;
-        u16 m_interruptMsg;
+class Keyboard : public HardwareDevice
+{
+public :
 
-        const sf::Input * r_input;
+	Keyboard() : HardwareDevice()
+	{
+		m_HID = DCPU_GENERIC_KEYBOARD_HID;
+		m_manufacturerID = DCPU_GENERIC_KEYBOARD_MANUFACTURER_ID;
+		m_version = DCPU_GENERIC_KEYBOARD_VERSION;
+		m_name = "GenericKeyboard";
+		m_interruptMsg = 0;
+		clearBuffer();
+	}
 
-    public :
+	void onEvent(const sf::Event & e);
+	virtual void interrupt();
 
-        Keyboard() : HardwareDevice()
-        {
-            m_HID = DCPU_GENERIC_KEYBOARD_HID;
-            m_manufacturerID = DCPU_GENERIC_KEYBOARD_MANUFACTURER_ID;
-            m_version = DCPU_GENERIC_KEYBOARD_VERSION;
-            m_name = "GenericKeyboard";
-            m_interruptMsg = 0;
-            r_input = 0;
-            clearBuffer();
-        }
+private:
 
-        void setInput(const sf::Input * input) { r_input = input; }
-        void onEvent(const sf::Event & e);
-        void pushEvent(u16 k);
-        u16 nextEvent();
-        bool isKeyPressed(u16 k);
-        void clearBuffer();
-        virtual void interrupt();
-    };
+	void pushEvent(u16 k);
+	u16 nextEvent();
+	bool isKeyPressed(u16 k);
+	void clearBuffer();
+
+	// Attributes
+
+	u16 m_buffer[DCPU_GENERIC_KEYBOARD_BUFSIZE]; // cyclic buffer
+	u16 m_bufferWritePos;
+	u16 m_bufferReadPos;
+	u16 m_interruptMsg;
+
+};
 
 } // namespace dcpu
 
 #endif // DCPUKEYBOARD_HPP_INCLUDED
+
+

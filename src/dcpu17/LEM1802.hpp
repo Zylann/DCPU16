@@ -20,60 +20,64 @@
 
 namespace dcpu
 {
-    class LEM1802 : public HardwareDevice
-    {
-    private :
+class LEM1802 : public HardwareDevice
+{
+public :
 
-        sf::Image m_defaultFont;
-        sf::Image m_font;
-        sf::Sprite m_fontSprite;
+	enum InterruptCodes
+	{
+		MEM_MAP_SCREEN = 0,
+		MEM_MAP_FONT,       // 1
+		MEM_MAP_PALETTE,    // 2
+		SET_BORDER_COLOR,   // 3
+		MEM_DUMP_FONT,      // 4
+		MEM_DUMP_PALETTE    // 5
+	};
 
-        u16 m_vramAddr;
-        u16 m_fontAddr;
-        u16 m_paletteAddr;
+	LEM1802() : HardwareDevice()
+	{
+		m_vramAddr = 0;
+		m_fontAddr = 0;
+		m_paletteAddr = 0;
+		m_name = "LEM1802";
+		m_HID = DCPU_LEM1802_HID;
+		m_manufacturerID = DCPU_LEM1802_MANUFACTURER_ID;
+		m_version = DCPU_LEM1802_VERSION;
 
-    public :
+		m_fontPixels.create(
+			DCPU_LEM1802_NTILES_X * DCPU_LEM1802_TILE_W,
+			DCPU_LEM1802_NTILES_Y * DCPU_LEM1802_TILE_H);
 
-        enum InterruptCodes
-        {
-            MEM_MAP_SCREEN = 0,
-            MEM_MAP_FONT,       // 1
-            MEM_MAP_PALETTE,    // 2
-            SET_BORDER_COLOR,   // 3
-            MEM_DUMP_FONT,      // 4
-            MEM_DUMP_PALETTE    // 5
-        };
+		m_fontSprite.setTexture(m_font);
+	}
 
-        LEM1802() : HardwareDevice()
-        {
-            m_vramAddr = 0;
-            m_fontAddr = 0;
-            m_paletteAddr = 0;
-            m_name = "LEM1802";
-            m_HID = DCPU_LEM1802_HID;
-            m_manufacturerID = DCPU_LEM1802_MANUFACTURER_ID;
-            m_version = DCPU_LEM1802_VERSION;
+	virtual void connect(DCPU & dcpu);
+	virtual void disconnect();
 
-            m_fontSprite.SetImage(m_font);
-        }
+	virtual void interrupt();
+	virtual void update(float delta);
 
-        virtual void connect(DCPU & dcpu);
-        virtual void disconnect();
+	void intMapScreen();
+	void intMapFont();
+	void intMapPalette();
+	void intSetBorderColor();
+	void intDumpFont();
+	void intDumpPalette();
 
-        virtual void interrupt();
-        virtual void update(float delta);
+	bool loadDefaultFontFromImage(const std::string & filename);
+	void render(sf::RenderWindow & win);
 
-        void intMapScreen();
-        void intMapFont();
-        void intMapPalette();
-        void intSetBorderColor();
-        void intDumpFont();
-        void intDumpPalette();
+private :
 
-        bool loadFontFromImage(const std::string & filename);
-        void render(sf::RenderWindow & win);
+	sf::Texture m_font;
+	sf::Image m_fontPixels;
+	sf::Sprite m_fontSprite;
 
-    };
+	u16 m_vramAddr;
+	u16 m_fontAddr;
+	u16 m_paletteAddr;
+
+};
 
 } // namespace dcpu
 

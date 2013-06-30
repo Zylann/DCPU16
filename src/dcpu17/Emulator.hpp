@@ -9,74 +9,74 @@
 #include "Clock.hpp"
 
 // Old DCPU standards
-#define DCPU11_VRAM_START 0x8000 // Video
-#define DCPU11_KBRAM_START 0x9000 // Keyboard
+//#define DCPU11_VRAM_START 0x8000 // Video
+//#define DCPU11_KBRAM_START 0x9000 // Keyboard
+
+namespace dcpu
+{
 
 /*
     SFML-based DCPU emulator window
 */
-
-namespace dcpu
+class Emulator
 {
-    class Emulator
-    {
-    private :
+private :
 
-        sf::RenderWindow * m_win;   // Main window
-        sf::Font m_font;            // Font for debug text
-        sf::String m_cpuStateText;  // CPU state display
+	sf::RenderWindow m_win;   // Main window
+	sf::Font m_font;            // Font for debug text
+	sf::Text m_cpuStateText;  // CPU state display
 
-        // RAMViz (Not implemented yet)
-        //sf::Image m_ramViz;         // RAM graphical view (words => pixels)
-        //u32 m_ramVizCursor          // Current position of ramViz updater
-        //sf::Sprite m_ramVizSprite;  // Sprite used to draw the RAMViz
+	// RAMViz (Not implemented yet)
+	//sf::Image m_ramViz;         // RAM graphical view (words => pixels)
+	//u32 m_ramVizCursor          // Current position of ramViz updater
+	//sf::Sprite m_ramVizSprite;  // Sprite used to draw the RAMViz
 
-        // DCPU16 1.7
-        DCPU m_dcpu;        // CPU
-        // Hardware devices
-        LEM1802 m_lem;      // Monitor
-        Keyboard m_keyboard;
-        Clock m_clock;
+	// DCPU16 1.7
+	DCPU m_dcpu;        // CPU
+	// Hardware devices
+	LEM1802 m_lem;      // Monitor
+	Keyboard m_keyboard;
+	Clock m_clock;
 
-    public :
+public :
 
-        // Constructs an emulator with all memories of the CPU set to 0
-        Emulator()
-        {
-            m_win = 0;
-            //m_ramVizCursor = 0;
-        }
+	// Constructs an emulator with all memories of the CPU set to 0
+	Emulator()
+	{
+//		m_win = 0;
+//		m_ramVizCursor = 0;
+	}
 
-        ~Emulator()
-        {
-            if(m_win != 0)
-                delete m_win;
-        }
+	~Emulator()
+	{
+//		if(m_win != 0)
+//			delete m_win;
+	}
 
-        // Loads ressources (images, fonts...).
-        // Returns false if it failed.
-        bool loadContent();
+	// Loads ressources (images, fonts...).
+	// Returns false if it failed.
+	bool loadContent();
 
-        // Loads a program into the DCPU16, returns false if it failed
-        bool loadProgram(const std::string & filename);
+	// Loads a program into the DCPU16, returns false if it failed
+	bool loadProgram(const std::string & filename);
 
-        // Dumps the DCPU memory as text, returns false if it failed
-        bool dumpMemoryAsText(const std::string & filename);
+	// Dumps the DCPU memory as text, returns false if it failed
+	bool dumpMemoryAsText(const std::string & filename);
 
-        // Runs the emulator
-        void run();
+	// Runs the emulator
+	void run();
 
-    private :
+private :
 
-        // Draws an overlay with information about the CPU
-        void drawCPUState();
+	// Draws an overlay with information about the CPU
+	void drawCPUState();
 
-        // Updates the DCPU16
-        void updateCPU();
+	// Updates the DCPU16
+	void updateCPU();
 
-        //void updateRamViz();
-        //void drawRamViz();
-    };
+	//void updateRamViz();
+	//void drawRamViz();
+};
 
 } // namespace dcpu
 

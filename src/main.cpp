@@ -14,7 +14,7 @@ int main(int argc, char * argv[])
 
     /* Handle command line arguments */
 
-    std::string programFileName = "dasm/text_editor.dasm";
+    std::string programFileName;// = "dasm/text_editor.dasm";
     if(argc == 2)
     {
         programFileName = argv[1];
