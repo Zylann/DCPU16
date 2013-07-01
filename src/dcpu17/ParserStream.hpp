@@ -13,9 +13,9 @@ inline bool isEndOfLine(char c)
 	return c == '\n' || c == '\r';
 }
 
-/*
-	This is a std::istream wrapper that can count line pos and number.
-*/
+//
+// This is a std::istream wrapper that can count line pos and number.
+//
 
 class ParserStream
 {
@@ -38,7 +38,7 @@ public :
 		m_lastChar = 0;
 	}
 
-	/* Accessors */
+	// Accessors
 
 	u32 getCol() const { return m_col; }
 	u32 getRow() const { return m_row; }
@@ -52,7 +52,7 @@ public :
 		std::streampos startPos,
 		std::streampos endPos);
 
-	/* istream wrapper methods */
+	// istream wrapper methods
 
 	// Same as istream::peek
 	char peek() const { return r_is.peek(); }

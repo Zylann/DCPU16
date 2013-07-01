@@ -126,7 +126,7 @@ bool Assembler::skipWhiteSpace()
 	while(m_pos < m_line.size())
 	{
 		if(isWhiteSpace(m_line[m_pos]))
-			m_pos++;
+			++m_pos;
 		else
 			break;
 	}
