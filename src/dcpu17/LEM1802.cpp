@@ -8,7 +8,6 @@ void LEM1802::connect(DCPU & dcpu)
 	HardwareDevice::connect(dcpu);
 	m_vramAddr = 0;
 	m_fontAddr = 0;
-	m_paletteAddr = 0;
 }
 
 void LEM1802::disconnect()
@@ -16,7 +15,36 @@ void LEM1802::disconnect()
 	HardwareDevice::disconnect();
 	m_vramAddr = 0;
 	m_fontAddr = 0;
-	m_paletteAddr = 0;
+}
+
+void LEM1802::loadDefaultPalette()
+{
+	for(u8 i = 0; i < 16; ++i)
+	{
+		bool bright = i & 0b1000;
+		sf::Color c(0,0,0,255);
+
+		if(i & 0b0100)
+		{
+			c.r = 127;
+			if(bright)
+				c.r += 128;
+		}
+		if(i & 0b0010)
+		{
+			c.g = 127;
+			if(bright)
+				c.g += 128;
+		}
+		if(i & 0b0001)
+		{
+			c.b = 127;
+			if(bright)
+				c.b += 128;
+		}
+
+		m_palette[i] = c;
+	}
 }
 
 void LEM1802::interrupt()
@@ -162,8 +190,30 @@ void LEM1802::intMapPalette()
 	// Reads the B register, and maps the palette ram to DCPU-16 ram starting
 	// at address B.
 	// If B is 0, the default palette is used instead.
+
 	assert(r_dcpu != 0);
-	// TODO LEM1802: handle palette
+
+	u16 paletteAddr = r_dcpu->getRegister(AD_B);
+
+	if(paletteAddr + 16 > DCPU_RAM_SIZE)
+	{
+#ifdef DCPU_DEBUG
+		std::cout << "E: LEM1802: intMapPalette: palette is out of bounds "
+			"(addr=" << (u32)paletteAddr << " in base 10)" << std::endl;
+#endif // DCPU_DEBUG
+		return;
+	}
+
+#ifdef DCPU_DEBUG
+	std::cout << "I: LEM1802: Mapping palette to addr=" << (u32)paletteAddr << std::endl;
+#endif
+	for(u16 i = 0; i < 16; ++i)
+	{
+		u16 w = r_dcpu->getMemory(paletteAddr+i);
+		m_palette[i].r = ((w >> 8) & 0xf) << 4;
+		m_palette[i].g = ((w >> 4) & 0xf) << 4;
+		m_palette[i].b = (w & 0xf) << 4;
+	}
 }
 
 void LEM1802::intSetBorderColor()
@@ -171,6 +221,9 @@ void LEM1802::intSetBorderColor()
 	// Reads the B register, and sets the border color to palette index B&0xF
 	assert(r_dcpu != 0);
 	// TODO LEM1802: handle border color
+#ifdef DCPU_DEBUG
+	std::cout << "E: LEM1802: intSetBorderColor: not implemented yet" << std::endl;
+#endif
 }
 
 void LEM1802::intDumpFont()
@@ -180,6 +233,9 @@ void LEM1802::intDumpFont()
 	// Halts the DCPU-16 for 256 cycles
 	assert(r_dcpu != 0);
 	// TODO LEM1802: dumpFont
+#ifdef DCPU_DEBUG
+	std::cout << "E: LEM1802: intDumpFont: not implemented yet" << std::endl;
+#endif
 }
 
 void LEM1802::intDumpPalette()
@@ -189,6 +245,9 @@ void LEM1802::intDumpPalette()
 	// Halts the DCPU-16 for 16 cycles
 	assert(r_dcpu != 0);
 	// TODO LEM1802: dumpPalette
+#ifdef DCPU_DEBUG
+	std::cout << "E: LEM1802: intDumpPalette: not implemented yet" << std::endl;
+#endif
 }
 
 bool LEM1802::loadDefaultFontFromImage(const std::string & filename)
@@ -237,49 +296,9 @@ void LEM1802::render(sf::RenderWindow & win)
 		u16 word = r_dcpu->getMemory(addr);
 		u8 c = word & 0x007f;
 		//bool blink = (word & 0x0080) != 0; // TODO LEM1802: handle blink
-		u8 format = ((word & 0xff00) >> 8) & 0x00ff;
-		bool fbright = (format & 0b10000000) != 0;
-		bool bbright = (format & 0b00001000) != 0;
 
-		sf::Color fclr, bclr;
-		// Foreground
-		if(format & 0b01000000) // ForeRed
-		{
-			fclr.r = 128;
-			if(fbright)
-				fclr.r += 127;
-		}
-		if(format & 0b00100000) // ForeGreen
-		{
-			fclr.g = 128;
-			if(fbright)
-				fclr.g += 127;
-		}
-		if(format & 0b00010000) // ForeBlue
-		{
-			fclr.b = 128;
-			if(fbright)
-				fclr.b += 127;
-		}
-		// Background
-		if(format & 0b00000100) // BackRed
-		{
-			bclr.r = 128;
-			if(bbright)
-				bclr.r += 127;
-		}
-		if(format & 0b00000010) // BackGreen
-		{
-			bclr.g = 128;
-			if(bbright)
-				bclr.g += 127;
-		}
-		if(format & 0b00000001) // BackBlue
-		{
-			bclr.b = 128;
-			if(bbright)
-				bclr.b += 127;
-		}
+		const sf::Color & fclr = m_palette[(word >> 12) & 0xf]; // Foreground
+		const sf::Color & bclr = m_palette[(word >> 8) & 0xf]; // Background
 
 		// Draw background
 		if(bclr.r || bclr.g || bclr.b)
@@ -290,23 +309,21 @@ void LEM1802::render(sf::RenderWindow & win)
 		}
 
 		// Draw foreground
-		if(fclr.r || fclr.g || fclr.b)
-		{
-			// Charset position
-			u16 cx = DCPU_LEM1802_TILE_W * (c % 32);
-			u16 cy = DCPU_LEM1802_TILE_H * (c / 32);
 
-			subRect.left = cx;
-			subRect.top = cy;
-			subRect.width = DCPU_LEM1802_TILE_W;
-			subRect.height = DCPU_LEM1802_TILE_H;
+		// Charset position
+		u16 cx = DCPU_LEM1802_TILE_W * (c % 32);
+		u16 cy = DCPU_LEM1802_TILE_H * (c / 32);
 
-			m_fontSprite.setTextureRect(subRect);
-			m_fontSprite.setPosition(x * DCPU_LEM1802_TILE_W, y * DCPU_LEM1802_TILE_H);
-			m_fontSprite.setColor(fclr);
+		subRect.left = cx;
+		subRect.top = cy;
+		subRect.width = DCPU_LEM1802_TILE_W;
+		subRect.height = DCPU_LEM1802_TILE_H;
 
-			win.draw(m_fontSprite);
-		}
+		m_fontSprite.setTextureRect(subRect);
+		m_fontSprite.setPosition(x * DCPU_LEM1802_TILE_W, y * DCPU_LEM1802_TILE_H);
+		m_fontSprite.setColor(fclr);
+
+		win.draw(m_fontSprite);
 	}
 }
 

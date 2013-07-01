@@ -38,11 +38,12 @@ public :
 	{
 		m_vramAddr = 0;
 		m_fontAddr = 0;
-		m_paletteAddr = 0;
 		m_name = "LEM1802";
 		m_HID = DCPU_LEM1802_HID;
 		m_manufacturerID = DCPU_LEM1802_MANUFACTURER_ID;
 		m_version = DCPU_LEM1802_VERSION;
+
+		loadDefaultPalette();
 
 		m_fontPixels.create(
 			DCPU_LEM1802_NTILES_X * DCPU_LEM1802_TILE_W,
@@ -69,13 +70,15 @@ public :
 
 private :
 
+	void loadDefaultPalette();
+
 	sf::Texture m_font;
 	sf::Image m_fontPixels;
 	sf::Sprite m_fontSprite;
 
 	u16 m_vramAddr;
 	u16 m_fontAddr;
-	u16 m_paletteAddr;
+	sf::Color m_palette[16];
 
 };
 
