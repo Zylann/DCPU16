@@ -13,6 +13,8 @@ void LEM1802::connect(DCPU & dcpu)
 
 void LEM1802::disconnect()
 {
+	//m_fontPixels.saveToFile("font.png");
+
 	HardwareDevice::disconnect();
 	m_vramAddr = 0;
 	m_fontAddr = 0;
@@ -165,15 +167,15 @@ void LEM1802::intMapFont()
 		u32 fontcode = (w1 << 16) | w2; // Note : '<<' is always a logical shift
 
 		// Get glyph pos
-		u16 cx = (k % 32) * DCPU_LEM1802_TILE_W;
-		u16 cy = (k / 32) * DCPU_LEM1802_TILE_H;
+		u16 cx = (k % DCPU_LEM1802_CHARSET_W) * DCPU_LEM1802_TILE_W;
+		u16 cy = (k / DCPU_LEM1802_CHARSET_W) * DCPU_LEM1802_TILE_H;
 
 		// Decode fontcode
 		for(u16 i = 0; i < DCPU_LEM1802_TILE_W; ++i)
 		for(u16 j = 0; j < DCPU_LEM1802_TILE_H; ++j)
 		{
 			u16 x = cx + i;
-			u16 y = cy + 7 - j;
+			u16 y = cy + DCPU_LEM1802_TILE_H - 1 - j;
 
 			if(fontcode > 0x7fffffff)
 				m_fontPixels.setPixel(x, y, sf::Color(255,255,255,255));
@@ -236,11 +238,59 @@ void LEM1802::intDumpFont()
 	// Reads the B register, and writes the default font data to DCPU-16 ram
 	// starting at address B.
 	// Halts the DCPU-16 for 256 cycles
+
 	assert(r_dcpu != 0);
-	// TODO LEM1802: dumpFont
+
+	u16 addr = r_dcpu->getRegister(1);
+
+	// Check if the address is valid
+	if(addr + 256 > DCPU_RAM_SIZE)
+	{
 #ifdef DCPU_DEBUG
-	std::cout << "E: " << m_name << ": intDumpFont: not implemented yet" << std::endl;
+		std::cout << "E: " << m_name << ": intDumpFont: "
+			<< "space at address " << FORMAT_HEX(addr) << "doesn't fits" << std::endl;
 #endif
+		return;
+	}
+
+#ifdef DCPU_DEBUG
+	std::cout << "I: " << m_name
+		<< ": Dumping default font to address " << FORMAT_HEX(addr) << std::endl;
+#endif
+
+	// For each glyph
+	for(u16 k = 0; k < 128; ++k, addr += 2)
+	{
+		// Font example with letter 'F':
+		// word0 = 11111111 /
+		//         00001001
+		// word1 = 00001001 /
+		//         00000000
+
+		u16 cx = (k % DCPU_LEM1802_CHARSET_W) * DCPU_LEM1802_TILE_W;
+		u16 cy = (k / DCPU_LEM1802_CHARSET_W) * DCPU_LEM1802_TILE_H;
+
+		// Encode fontcode
+		u32 fontcode=0;
+		for(u16 i = 0; i < DCPU_LEM1802_TILE_W; ++i)
+		for(u16 j = 0; j < DCPU_LEM1802_TILE_H; ++j)
+		{
+			u32 x = cx + i;
+			u32 y = cy + DCPU_LEM1802_TILE_H - 1 - j;
+
+			sf::Color c = m_defaultFontPixels.getPixel(x, y);
+
+			fontcode <<= 1;
+			if(c.r != 0)
+				fontcode |= 1;
+		}
+
+		// Set fontcode
+		r_dcpu->setMemory(addr, (fontcode >> 16) & 0xffff);
+		r_dcpu->setMemory(addr+1, fontcode & 0xffff);
+	}
+
+	r_dcpu->halt(256);
 }
 
 void LEM1802::intDumpPalette()
@@ -257,21 +307,23 @@ void LEM1802::intDumpPalette()
 
 bool LEM1802::loadDefaultFontFromImage(const std::string & filename)
 {
-	if(!m_fontPixels.loadFromFile(filename))
+	if(!m_defaultFontPixels.loadFromFile(filename))
 	{
 		std::cout << "E: " << m_name << ": couldn't load font asset '" << filename << "'" << std::endl;
 		return false;
 	}
 	// Replace non-white by alpha 0
-	for(u32 y = 0; y < m_fontPixels.getSize().y; ++y)
-	for(u32 x = 0; x < m_fontPixels.getSize().x; ++x)
+	for(u32 y = 0; y < m_defaultFontPixels.getSize().y; ++y)
+	for(u32 x = 0; x < m_defaultFontPixels.getSize().x; ++x)
 	{
-		const sf::Color & pix = m_fontPixels.getPixel(x, y);
+		const sf::Color & pix = m_defaultFontPixels.getPixel(x, y);
 		if(pix.r != 255 && pix.g != 255 && pix.b != 255)
-			m_fontPixels.setPixel(x, y, sf::Color(0,0,0,0));
+		{
+			m_defaultFontPixels.setPixel(x, y, sf::Color(0,0,0,0));
+		}
 	}
 
-	m_font.loadFromImage(m_fontPixels);
+	m_font.loadFromImage(m_defaultFontPixels);
 	m_font.setSmooth(false);
 
 	return true;

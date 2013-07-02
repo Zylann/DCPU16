@@ -10,6 +10,9 @@
 #define DCPU_LEM1802_NTILES_X           32
 #define DCPU_LEM1802_NTILES_Y           12
 
+#define DCPU_LEM1802_CHARSET_W 			32
+#define DCPU_LEM1802_CHARSET_H 			4
+
 #define DCPU_LEM1802_VRAM_SIZE          DCPU_NTILES_X * DCPU_NTILES_Y
 #define DCPU_LEM1802_W                  DCPU_LEM1802_TILE_W * DCPU_LEM1802_NTILES_X
 #define DCPU_LEM1802_H                  DCPU_LEM1802_TILE_H * DCPU_LEM1802_NTILES_Y
@@ -46,8 +49,8 @@ public :
 		loadDefaultPalette();
 
 		m_fontPixels.create(
-			DCPU_LEM1802_NTILES_X * DCPU_LEM1802_TILE_W,
-			DCPU_LEM1802_NTILES_Y * DCPU_LEM1802_TILE_H);
+			DCPU_LEM1802_CHARSET_W * DCPU_LEM1802_TILE_W,
+			DCPU_LEM1802_CHARSET_H * DCPU_LEM1802_TILE_H);
 
 		m_fontSprite.setTexture(m_font);
 	}
@@ -74,6 +77,7 @@ private :
 
 	sf::Texture m_font;
 	sf::Image m_fontPixels;
+	sf::Image m_defaultFontPixels;
 	sf::Sprite m_fontSprite;
 
 	u16 m_vramAddr;

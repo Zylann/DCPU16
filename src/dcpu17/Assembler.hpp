@@ -58,6 +58,7 @@ struct Variable
 };
 
 // TODO Assembler: should use the new generic Parser
+// Note: this assembler takes to much lines. I'm sure there is a shorter way to implement it.
 
 class Assembler
 {

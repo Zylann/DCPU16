@@ -52,12 +52,12 @@ bool preprocessFile(
 // Clears the console
 inline void clearConsole()
 {
-	#ifdef WINDOWS
+#ifdef WINDOWS
 	std::system("CLS");
-	#else
+#else
 	// Assume POSIX
 	std::system("clear");
-	#endif
+#endif
 }
 
 // Converts a 4-bit integer into its ASCII hexadecimal digit
