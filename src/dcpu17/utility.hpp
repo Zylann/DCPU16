@@ -66,6 +66,10 @@ char u4ToHexChar(u8 n);
 // Converts a 16-bit integer into its ASCII hexadecimal digits
 void u16ToHexStr(u16 n, char str[4]);
 
+// Converts a 16-bit integer into its ASCII hexadecimal digits
+// (std::string version, a bit slower)
+std::string u16ToHexStr(u16 n);
+
 // Returns true if the given character is a hexadecimal digit
 inline bool isHexDigit(char c)
 {

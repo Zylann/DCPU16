@@ -1,5 +1,6 @@
 #include <assert.h>
 #include "Keyboard.hpp"
+#include "utility.hpp"
 
 namespace dcpu
 {
@@ -203,14 +204,14 @@ void Keyboard::interrupt()
 		m_interruptMsg = r_dcpu->getRegister(AD_B);
 #ifdef DCPU_DEBUG
 		std::cout << "I: GenericKeyboard: set interruptMsg to "
-			<< m_interruptMsg << std::endl;
+		          << FORMAT_HEX(m_interruptMsg) << std::endl;
 #endif
 		break;
 
 	default:
 #ifdef DCPU_DEBUG
-		std::cout << "E: GenericKeyboard: received unknown interrupt ("
-			<< r << ")" << std::endl;
+		std::cout << "E: GenericKeyboard: received unknown interrupt code "
+	              << FORMAT_HEX(r) << std::endl;
 #endif
 		break;
 	}

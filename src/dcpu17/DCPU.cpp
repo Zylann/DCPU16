@@ -241,8 +241,6 @@ void DCPU::basicOp(u16 op)
 	s32 res = 0;
 	m_cycles += g_opCost[opcode];
 
-	//std::cout << (u32)opcode << std::endl;
-
 	switch (opcode)
 	{
 	case OP_SET:
@@ -405,8 +403,8 @@ void DCPU::basicOp(u16 op)
 
 	default :
 #ifdef DCPU_DEBUG
-		std::cout << "E: Unknown opcode (" << (u32)opcode << ")"
-			<< " at address " << (u32)m_pc << std::endl;
+		std::cout << "E: Unknown opcode " << FORMAT_HEX(opcode)
+				  << " at address " << FORMAT_HEX(m_pc) << std::endl;
 		setBroken(true);
 #endif
 		return;
@@ -503,15 +501,15 @@ void DCPU::extendedOp(u16 op)
 			m_hardwareDevices[a]->interrupt();
 #ifdef DCPU_DEBUG
 		else
-			std::cout << "E: Failed to send an interrupt to HD ("
-				<< a << "), which is not connected." << std::endl;
+			std::cout << "E: Failed to send an interrupt to hardware device "
+				<< FORMAT_HEX(a) << ", which is not connected." << std::endl;
 #endif
 		return;
 
 	default:
 #ifdef DCPU_DEBUG
-		std::cout << "E: Unknown ex. opcode (" << (u32)exOpcode << ")"
-			<< " at address " << (u32)m_pc << std::endl;
+		std::cout << "E: Unknown non-basic opcode " << FORMAT_HEX(exOpcode)
+			<< " at address " << FORMAT_HEX(m_pc) << std::endl;
 		setBroken(true);
 #endif
 		return;
@@ -536,7 +534,7 @@ void DCPU::interrupt(u16 msg)
 	{
 		// Perform interrupt
 #ifdef DCPU_DEBUG
-		std::cout << "I: Interrupt triggered (" << (int)msg << ")" << std::endl;
+		std::cout << "I: Interrupt triggered " << FORMAT_HEX(msg) << std::endl;
 #endif
 		m_intQueueing = true;
 		m_ram[--m_sp] = m_pc;
@@ -629,18 +627,18 @@ void DCPU::setBroken(bool b)
 // Prints CPU state as text in a stream
 void DCPU::printState(std::ostream & os)
 {
-	os << "A  = " << m_r[0] << "\n";
-	os << "B  = " << m_r[1] << "\n";
-	os << "C  = " << m_r[2] << "\n";
-	os << "X  = " << m_r[3] << "\n";
-	os << "Y  = " << m_r[4] << "\n";
-	os << "Z  = " << m_r[5] << "\n";
-	os << "I  = " << m_r[6] << "\n";
-	os << "J  = " << m_r[7] << "\n";
-	os << "PC = " << m_pc << "\n";
-	os << "SP = " << m_sp << "\n";
-	os << "EX = " << m_ex << "\n";
-	os << "IA = " << m_ia << "\n";
+	os << "A  = " << FORMAT_HEX(m_r[0]) << "\n";
+	os << "B  = " << FORMAT_HEX(m_r[1]) << "\n";
+	os << "C  = " << FORMAT_HEX(m_r[2]) << "\n";
+	os << "X  = " << FORMAT_HEX(m_r[3]) << "\n";
+	os << "Y  = " << FORMAT_HEX(m_r[4]) << "\n";
+	os << "Z  = " << FORMAT_HEX(m_r[5]) << "\n";
+	os << "I  = " << FORMAT_HEX(m_r[6]) << "\n";
+	os << "J  = " << FORMAT_HEX(m_r[7]) << "\n";
+	os << "PC = " << FORMAT_HEX(m_pc) << "\n";
+	os << "SP = " << FORMAT_HEX(m_sp) << "\n";
+	os << "EX = " << FORMAT_HEX(m_ex) << "\n";
+	os << "IA = " << FORMAT_HEX(m_ia) << "\n";
 	os << "Queued interrupts = " << m_intQueuePos << "\n";
 	os << "Connected HDs = " << m_hardwareDevices.size() << "\n";
 	os << "Steps = " << m_steps << "\n";

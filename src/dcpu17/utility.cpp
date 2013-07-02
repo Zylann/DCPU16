@@ -164,7 +164,7 @@ bool dumpAsImage(const DCPU & cpu, const std::string & filename)
 	for(u32 x = 0; x < viz.getSize().x; ++x)
 	{
 		u16 w = cpu.getMemory(i);
-		c.r = (w >> 8) & 0xff;
+		c.b = (w >> 8) & 0xff;
 		c.g = w & 0xff;
 		viz.setPixel(x, y, c);
 		++i;
@@ -231,7 +231,7 @@ void u16ToHexStr(u16 n, char str[4])
 	u8 d = 0;
 	u8 di = 0;
 
-	for(u8 i = 0; i < 16; i++)
+	for(u8 i = 0; i < 16; ++i)
 	{
 		if((n & m) != 0)
 			d |= 1;
@@ -246,6 +246,14 @@ void u16ToHexStr(u16 n, char str[4])
 		m >>= 1;
 		d <<= 1;
 	}
+}
+
+std::string u16ToHexStr(u16 n)
+{
+	char cstr[5] = {'0','0','0','0','\0'};
+	u16ToHexStr(n, cstr);
+	std::string str(cstr);
+	return "0x" + str;
 }
 
 } // namespace dcpu

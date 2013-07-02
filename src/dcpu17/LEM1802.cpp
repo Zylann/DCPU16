@@ -1,5 +1,6 @@
 #include <assert.h>
 #include "LEM1802.hpp"
+#include "utility.hpp"
 
 namespace dcpu
 {
@@ -53,7 +54,7 @@ void LEM1802::interrupt()
 	u16 a = r_dcpu->getRegister(AD_A);
 
 #ifdef DCPU_DEBUG
-	std::cout << "I: LEM1802: received interrupt (" << a << ")" << std::endl;
+	std::cout << "I: " << m_name << ": received interrupt code " << FORMAT_HEX(a) << std::endl;
 #endif
 
 	switch(a)
@@ -84,7 +85,8 @@ void LEM1802::interrupt()
 
 	default:
 #ifdef DCPU_DEBUG
-		std::cout << "E: LEM1802: received an invalid intCode (" << a << ")" << std::endl;
+		std::cout << "E: " << m_name << ": received an invalid interrupt code "
+	              << FORMAT_HEX(a) << std::endl;
 #endif
 		break;
 	}
@@ -102,7 +104,8 @@ void LEM1802::intMapScreen()
 	m_vramAddr = b;
 
 #ifdef DCPU_DEBUG
-	std::cout << "I: LEM1802: screen mapped to addr=" << (int)m_vramAddr << std::endl;
+	std::cout << "I: " << m_name
+		<< ": screen mapped to addr=" << FORMAT_HEX(m_vramAddr) << std::endl;
 #endif
 
 	// TODO LEM1802: 1s delay if b goes from 0 to any other value
@@ -128,7 +131,7 @@ void LEM1802::intMapFont()
 	if(addr == 0)
 	{
 #ifdef DCPU_DEBUG
-		std::cout << "I: LEM1802: Mapping default font" << std::endl;
+		std::cout << "I: " << m_name << ": Mapping default font" << std::endl;
 #endif
 		// TODO: LEM1802: this font should be preloaded
 		std::string path = DCPU_ASSETS_DIR;
@@ -138,13 +141,14 @@ void LEM1802::intMapFont()
 
 	if(DCPU_RAM_SIZE - addr < 256)
 	{
-		std::cout << "E: LEM1802: Can't map font from adress "
-			<< (int)addr << ", not enough space" << std::endl;
+		std::cout << "E: " << m_name
+			<< ": Can't map font from adress "
+			<< FORMAT_HEX(addr) << ", not enough space" << std::endl;
 		return;
 	}
 
 #ifdef DCPU_DEBUG
-	std::cout << "I: LEM1802: Mapping font to addr=" << (int)addr << std::endl;
+	std::cout << "I: " << m_name << ": Mapping font to addr=" << FORMAT_HEX(addr) << std::endl;
 #endif
 
 	// For each glyph
@@ -198,14 +202,15 @@ void LEM1802::intMapPalette()
 	if(paletteAddr + 16 > DCPU_RAM_SIZE)
 	{
 #ifdef DCPU_DEBUG
-		std::cout << "E: LEM1802: intMapPalette: palette is out of bounds "
-			"(addr=" << (u32)paletteAddr << " in base 10)" << std::endl;
+		std::cout << "E: " << m_name << ": intMapPalette: palette address "
+			<< FORMAT_HEX(paletteAddr) << " is out of bounds." << std::endl;
 #endif // DCPU_DEBUG
 		return;
 	}
 
 #ifdef DCPU_DEBUG
-	std::cout << "I: LEM1802: Mapping palette to addr=" << (u32)paletteAddr << std::endl;
+	std::cout << "I: " << m_name
+		<< ": Mapping palette to address " << FORMAT_HEX(paletteAddr) << std::endl;
 #endif
 	for(u16 i = 0; i < 16; ++i)
 	{
@@ -222,7 +227,7 @@ void LEM1802::intSetBorderColor()
 	assert(r_dcpu != 0);
 	// TODO LEM1802: handle border color
 #ifdef DCPU_DEBUG
-	std::cout << "E: LEM1802: intSetBorderColor: not implemented yet" << std::endl;
+	std::cout << "E: " << m_name << ": intSetBorderColor: not implemented yet" << std::endl;
 #endif
 }
 
@@ -234,7 +239,7 @@ void LEM1802::intDumpFont()
 	assert(r_dcpu != 0);
 	// TODO LEM1802: dumpFont
 #ifdef DCPU_DEBUG
-	std::cout << "E: LEM1802: intDumpFont: not implemented yet" << std::endl;
+	std::cout << "E: " << m_name << ": intDumpFont: not implemented yet" << std::endl;
 #endif
 }
 
@@ -246,7 +251,7 @@ void LEM1802::intDumpPalette()
 	assert(r_dcpu != 0);
 	// TODO LEM1802: dumpPalette
 #ifdef DCPU_DEBUG
-	std::cout << "E: LEM1802: intDumpPalette: not implemented yet" << std::endl;
+	std::cout << "E: " << m_name << ": intDumpPalette: not implemented yet" << std::endl;
 #endif
 }
 
@@ -254,8 +259,7 @@ bool LEM1802::loadDefaultFontFromImage(const std::string & filename)
 {
 	if(!m_fontPixels.loadFromFile(filename))
 	{
-		std::cout << "Error: couldn't load asset '"
-			<< filename << "'" << std::endl;
+		std::cout << "E: " << m_name << ": couldn't load font asset '" << filename << "'" << std::endl;
 		return false;
 	}
 	// Replace non-white by alpha 0

@@ -8,6 +8,7 @@
 
 #include <string.h> // for memset
 #include <iostream>
+//#include <iomanip> // for output formatting
 #include <vector>
 
 #include "common.hpp"
@@ -19,6 +20,10 @@
 #define DCPU_MAX_HD 65535
 
 #define DCPU_STANDARD_FREQUENCY 100000
+
+// Shortcut for integer formatted stream output
+// Note : I could use iomanip, but it's long and didn't found how to reset format after use
+#define FORMAT_HEX(__a) u16ToHexStr(__a) << " (" << (u32)__a << ")"
 
 namespace dcpu
 {

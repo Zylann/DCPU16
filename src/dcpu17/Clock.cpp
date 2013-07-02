@@ -1,5 +1,6 @@
 #include <assert.h>
 #include "Clock.hpp"
+#include "utility.hpp"
 
 namespace dcpu
 {
@@ -34,8 +35,8 @@ void Clock::interrupt()
 	default:
 #ifdef DCPU_DEBUG
 		std::cout << "E: " << m_name
-			<< ": received unknown interrupt ("
-			<< (int)a << ")" << std::endl;
+			<< ": received unknown interrupt code "
+			<< FORMAT_HEX(a) << std::endl;
 #endif
 		break;
 	}

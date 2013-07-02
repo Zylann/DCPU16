@@ -1,3 +1,10 @@
+//
+// DCPU-16 emulator
+// by Marc Gilleron
+//
+// Uses SFML2, STL and GCC/MinGW. No C++11 yet.
+//
+
 #include <iostream>
 #include <cstdio>
 #include <cstdlib>
