@@ -4,6 +4,7 @@
 
 namespace dcpu
 {
+
 void LEM1802::connect(DCPU & dcpu)
 {
 	HardwareDevice::connect(dcpu);
@@ -20,7 +21,7 @@ void LEM1802::disconnect()
 	m_fontAddr = 0;
 }
 
-void LEM1802::loadDefaultPalette()
+void LEM1802::initDefaultPalette()
 {
 	for(u8 i = 0; i < 16; ++i)
 	{
@@ -46,8 +47,13 @@ void LEM1802::loadDefaultPalette()
 				c.b += 128;
 		}
 
-		m_palette[i] = c;
+		m_defaultPalette[i] = c;
 	}
+}
+
+void LEM1802::loadDefaultPalette()
+{
+	memcpy(m_palette, m_defaultPalette, 16 * sizeof(sf::Color));
 }
 
 void LEM1802::interrupt()
@@ -241,7 +247,7 @@ void LEM1802::intDumpFont()
 
 	assert(r_dcpu != 0);
 
-	u16 addr = r_dcpu->getRegister(1);
+	u16 addr = r_dcpu->getRegister(AD_B);
 
 	// Check if the address is valid
 	if(addr + 256 > DCPU_RAM_SIZE)
@@ -298,11 +304,34 @@ void LEM1802::intDumpPalette()
 	// Reads the B register, and writes the default palette data to DCPU-16
 	// ram starting at address B.
 	// Halts the DCPU-16 for 16 cycles
+
 	assert(r_dcpu != 0);
-	// TODO LEM1802: dumpPalette
+
+	u16 paletteAddr = r_dcpu->getRegister(AD_B);
+
+	// Check address
+	if(paletteAddr + 16 > DCPU_RAM_SIZE)
+	{
 #ifdef DCPU_DEBUG
-	std::cout << "E: " << m_name << ": intDumpPalette: not implemented yet" << std::endl;
+		std::cout << "E: " << m_name << ": intDumpPalette: palette address "
+			<< FORMAT_HEX(paletteAddr) << " is out of bounds." << std::endl;
+#endif // DCPU_DEBUG
+		return;
+	}
+
+#ifdef DCPU_DEBUG
+	std::cout << "I: " << m_name
+		<< ": Dumping palette to address " << FORMAT_HEX(paletteAddr) << std::endl;
 #endif
+	for(u16 i = 0; i < 16; ++i)
+	{
+		u16 w = m_defaultPalette[i].b;
+		w |= m_defaultPalette[i].g << 4;
+		w |= m_defaultPalette[i].r << 8;
+		r_dcpu->setMemory(paletteAddr+i, w);
+	}
+
+	r_dcpu->halt(16);
 }
 
 bool LEM1802::loadDefaultFontFromImage(const std::string & filename)

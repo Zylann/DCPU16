@@ -53,6 +53,8 @@ public :
 			DCPU_LEM1802_CHARSET_H * DCPU_LEM1802_TILE_H);
 
 		m_fontSprite.setTexture(m_font);
+
+		initDefaultPalette();
 	}
 
 	virtual void connect(DCPU & dcpu);
@@ -73,16 +75,19 @@ public :
 
 private :
 
+	void initDefaultPalette();
 	void loadDefaultPalette();
 
 	sf::Texture m_font;
 	sf::Image m_fontPixels;
 	sf::Image m_defaultFontPixels;
 	sf::Sprite m_fontSprite;
+	sf::Color m_borderColor;
 
 	u16 m_vramAddr;
 	u16 m_fontAddr;
 	sf::Color m_palette[16];
+	sf::Color m_defaultPalette[16];
 
 };
 
