@@ -42,9 +42,10 @@ bool Emulator::loadProgram(const std::string & filename)
 	return dcpu::loadProgram(m_dcpu, filename);
 }
 
-bool Emulator::dumpMemoryAsText(const std::string & filename)
+bool Emulator::dumpMemory(const std::string & name)
 {
-	return dcpu::dumpAsText(m_dcpu, filename);
+	return dcpu::dumpAsText(m_dcpu, name + ".txt")
+		&& dcpu::dumpAsImage(m_dcpu, name + ".png");
 }
 
 // Runs the emulator

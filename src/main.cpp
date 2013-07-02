@@ -28,9 +28,9 @@ int main(int argc, char * argv[])
 
 		if(emulator.loadProgram(programFileName))
 		{
-			emulator.dumpMemoryAsText("dump0.txt");
+			emulator.dumpMemory("dump0");
 			emulator.run();
-			emulator.dumpMemoryAsText("dump1.txt");
+			emulator.dumpMemory("dump1");
 		}
 	}
 	else if(argc == 4)

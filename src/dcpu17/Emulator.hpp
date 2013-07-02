@@ -56,8 +56,8 @@ public :
 	// Loads a program into the DCPU16, returns false if it failed
 	bool loadProgram(const std::string & filename);
 
-	// Dumps the DCPU memory as text, returns false if it failed
-	bool dumpMemoryAsText(const std::string & filename);
+	// Dumps the DCPU memory as file(s), returns false if it failed
+	bool dumpMemory(const std::string & name);
 
 	// Runs the emulator
 	void run();

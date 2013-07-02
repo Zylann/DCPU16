@@ -152,6 +152,33 @@ bool dumpAsText(DCPU & cpu, const std::string & filename)
 	return true;
 }
 
+bool dumpAsImage(const DCPU & cpu, const std::string & filename)
+{
+	sf::Image viz;
+	viz.create(256, 256, sf::Color::Black);
+
+	u16 i = 0;
+	sf::Color c(0,0,0);
+
+	for(u32 y = 0; y < viz.getSize().y; ++y)
+	for(u32 x = 0; x < viz.getSize().x; ++x)
+	{
+		u16 w = cpu.getMemory(i);
+		c.r = (w >> 8) & 0xff;
+		c.g = w & 0xff;
+		viz.setPixel(x, y, c);
+		++i;
+	}
+
+	if(!viz.saveToFile(filename))
+	{
+		std::cout << "E: dumpAsImage: couldn't save '" << filename << "'" << std::endl;
+		return false;
+	}
+
+	return true;
+}
+
 bool preprocessFile(
 	const std::string & inputFilename,
 	const std::string & outputFilename)

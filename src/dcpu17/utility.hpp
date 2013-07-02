@@ -29,6 +29,10 @@ bool loadProgram(DCPU & cpu, const std::string & filename);
 // Returns false if an error occurred.
 bool dumpAsText(DCPU & cpu, const std::string & filename);
 
+// Creates and saves an image representing the memory of the DCPU.
+// This is a toy feature, might be useful for locating modified memory segments.
+bool dumpAsImage(const DCPU & cpu, const std::string & filename);
+
 // Converts an image to DASM "DAT" font code
 // Returns false if an error occurred.
 bool convertImageToDASMFont(

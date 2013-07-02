@@ -1,6 +1,6 @@
 /bin
 /backups
-/assets/src
+/assets_src
 /obj
 /releases
 *.o
@@ -9,5 +9,7 @@
 *.layout
 dump0.txt
 dump1.txt
+dump0.png
+dump1.png
 *~
 
