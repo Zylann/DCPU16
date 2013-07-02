@@ -45,6 +45,7 @@ public :
 		m_HID = DCPU_LEM1802_HID;
 		m_manufacturerID = DCPU_LEM1802_MANUFACTURER_ID;
 		m_version = DCPU_LEM1802_VERSION;
+		m_borderColor = sf::Color(0,0,128);
 
 		loadDefaultPalette();
 

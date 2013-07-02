@@ -3,9 +3,9 @@
 #include "Emulator.hpp"
 #include "utility.hpp"
 
-#define DCPU_FRAMERATE 60
-#define DCPU_SCREEN_W DCPU_LEM1802_W
-#define DCPU_SCREEN_H DCPU_LEM1802_H
+#define DCPU_EMU_FRAMERATE 60
+#define DCPU_EMU_SCREEN_W DCPU_LEM1802_W
+#define DCPU_EMU_SCREEN_H DCPU_LEM1802_H
 #define DCPU_EMU_FREQUENCY DCPU_STANDARD_FREQUENCY
 
 namespace dcpu
@@ -59,16 +59,16 @@ void Emulator::run()
 	m_clock.connect(m_dcpu);
 
 	// Video mode
-	int ratio = 4;
+	int k = 4;
 	sf::VideoMode videoMode(
-		ratio * DCPU_SCREEN_W,
-		ratio * DCPU_SCREEN_H);
+		k * (DCPU_EMU_SCREEN_W+2),
+		k * (DCPU_EMU_SCREEN_H+2));
 
 	m_win.create(videoMode, "DCPU16 Emulator");
-	m_win.setFramerateLimit(DCPU_FRAMERATE);
+	m_win.setFramerateLimit(DCPU_EMU_FRAMERATE);
 
 	// Set view
-	sf::View dcpuView(sf::FloatRect(0, 0, DCPU_SCREEN_W, DCPU_SCREEN_H));
+	sf::View dcpuView(sf::FloatRect(-1, -1, DCPU_EMU_SCREEN_W+2, DCPU_EMU_SCREEN_H+2));
 	m_win.setView(dcpuView);
 
 	sf::Event event;

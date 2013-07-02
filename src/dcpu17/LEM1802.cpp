@@ -233,10 +233,14 @@ void LEM1802::intSetBorderColor()
 {
 	// Reads the B register, and sets the border color to palette index B&0xF
 	assert(r_dcpu != 0);
-	// TODO LEM1802: handle border color
+
+	u16 i = r_dcpu->getRegister(AD_B) & 0xf;
+
 #ifdef DCPU_DEBUG
-	std::cout << "E: " << m_name << ": intSetBorderColor: not implemented yet" << std::endl;
+	std::cout << "I: " << m_name << ": intSetBorderColor: set to color " << FORMAT_HEX(i) << std::endl;
 #endif
+
+	m_borderColor = m_palette[i];
 }
 
 void LEM1802::intDumpFont()
@@ -373,8 +377,15 @@ void LEM1802::render(sf::RenderWindow & win)
 
 	u16 x, y, addr = m_vramAddr;
 	sf::IntRect subRect;
-	sf::RectangleShape bgRect(sf::Vector2f(DCPU_LEM1802_TILE_W, DCPU_LEM1802_TILE_H));
+	sf::RectangleShape charBGRect(sf::Vector2f(DCPU_LEM1802_TILE_W, DCPU_LEM1802_TILE_H));
 
+	// Border and BG
+	sf::RectangleShape borderRect(sf::Vector2f(DCPU_LEM1802_W, DCPU_LEM1802_H));
+	borderRect.setFillColor(sf::Color(8,8,8,255));
+	borderRect.setOutlineColor(m_borderColor);
+	win.draw(borderRect);
+
+	// Tiles
 	for(y = 0; y < DCPU_LEM1802_NTILES_Y; ++y)
 	for(x = 0; x < DCPU_LEM1802_NTILES_X; ++x, ++addr)
 	{
@@ -388,9 +399,9 @@ void LEM1802::render(sf::RenderWindow & win)
 		// Draw background
 		if(bclr.r || bclr.g || bclr.b)
 		{
-			bgRect.setPosition(x * DCPU_LEM1802_TILE_W, y * DCPU_LEM1802_TILE_H);
-			bgRect.setFillColor(bclr);
-			win.draw(bgRect);
+			charBGRect.setPosition(x * DCPU_LEM1802_TILE_W, y * DCPU_LEM1802_TILE_H);
+			charBGRect.setFillColor(bclr);
+			win.draw(charBGRect);
 		}
 
 		// Draw foreground
