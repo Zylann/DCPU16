@@ -1,15 +1,15 @@
 DCPU-16 custom tools
---------------------
+====================
 
 	This is a C++ implementation of the DCPU16 from Mojang's game 0x10c.
 	It is based on the 1.7 specification (see doc directory).
 	0x10c's website : http://0x10c.com/
 
 Current features
-----------------
+================
 
 	- DASM16 assembler
-	- LEM1802 emulation (changing palette/border color is not supported yet)
+	- LEM1802 emulation (text-based display with 16-color palette support)
 	- Generic Keyboard emulation
 	- Generic Clock emulation
 	- Instant CPU state display with an overlay by hitting TAB
@@ -18,7 +18,7 @@ Current features
 	- Basic preprocessor (still WIP, only a 1-level #include is supported)
 
 Planned features
-----------------
+================
 
 	- Print help in command line
 	- N-level #include with infinite inclusion checking
@@ -30,12 +30,12 @@ Planned features
 	- Games and IDE?
 
 Releases
---------
+========
 
 	Not available for now, I should upload binaries soon.
 
 Compiling / dependencies
-------------------------
+========================
 
 	SFML 2.0 : http://www.sfml-dev.org/
 	
@@ -46,7 +46,7 @@ Compiling / dependencies
 		this directory contains an outdated version of the emulator for 1.1 specs.
 
 How to use
-----------
+==========
 
 	In the command line :
 	
@@ -66,7 +66,8 @@ How to use
 	dcpu
 		# Prints an error (should print help later)
 
-==================== More detailed info ========================================
+Assembler details
+=================
 
 The preprocessor
 
