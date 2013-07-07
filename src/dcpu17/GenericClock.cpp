@@ -1,10 +1,10 @@
 #include <assert.h>
-#include "Clock.hpp"
+#include "GenericClock.hpp"
 #include "utility.hpp"
 
 namespace dcpu
 {
-void Clock::interrupt()
+void GenericClock::interrupt()
 {
 #ifdef DCPU_DEBUG
 	assert(r_dcpu != 0);
@@ -42,7 +42,7 @@ void Clock::interrupt()
 	}
 }
 
-void Clock::update(float delta)
+void GenericClock::update(float delta)
 {
 #ifdef DCPU_DEBUG
 	assert(r_dcpu != 0);

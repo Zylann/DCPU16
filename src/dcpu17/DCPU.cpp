@@ -391,14 +391,14 @@ void DCPU::basicOp(u16 op)
 
 	case OP_STI:
 		res = a;
-		m_r[AD_I]++;
-		m_r[AD_J]++;
+		++m_r[AD_I];
+		++m_r[AD_J];
 		break;
 
 	case OP_STD:
 		res = a;
-		m_r[AD_I]--;
-		m_r[AD_J]--;
+		--m_r[AD_I];
+		--m_r[AD_J];
 		break;
 
 	default :
@@ -553,7 +553,7 @@ bool DCPU::pushInterrupt(u16 msg)
 		m_intQueuePos = 0;
 	}
 	else
-		m_intQueuePos++;
+		++m_intQueuePos;
 
 	if(m_intQueuePos == DCPU_INTQ_SIZE)
 	{
@@ -591,7 +591,8 @@ u16 DCPU::connectHardware(IHardwareDevice * hd)
 	if(m_hardwareDevices.size() == DCPU_MAX_HD)
 	{
 #ifdef DCPU_DEBUG
-		std::cout << "E: can't connect another hardware device, limit has been reached" << std::endl;
+		std::cout << "E: can't connect another hardware device, "
+			"the limit has been reached" << std::endl;
 #endif
 		return m_hardwareDevices.size();
 	}

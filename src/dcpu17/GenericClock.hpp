@@ -10,18 +10,11 @@
 
 namespace dcpu
 {
-class Clock : public HardwareDevice
+class GenericClock : public HardwareDevice
 {
-protected :
-
-	sf::Clock m_timer;
-	float m_tickInterval;
-	u16 m_ticks;
-	u16 m_interruptMsg;
-
 public :
 
-	Clock() : HardwareDevice()
+	GenericClock() : HardwareDevice()
 	{
 		m_name = "GenericClock";
 		m_HID = DCPU_GENERIC_CLOCK_HID;
@@ -35,8 +28,18 @@ public :
 
 	virtual void interrupt();
 	virtual void update(float delta);
+
+protected :
+
+	sf::Clock m_timer;
+	float m_tickInterval;
+	u16 m_ticks;
+	u16 m_interruptMsg;
+
 };
 
 } // namespace dcpu
 
 #endif // HEADER_CLOCK_HPP_INCLUDED
+
+

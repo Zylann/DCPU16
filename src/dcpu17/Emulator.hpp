@@ -6,7 +6,7 @@
 #include "DCPU.hpp"
 #include "LEM1802.hpp"
 #include "Keyboard.hpp"
-#include "Clock.hpp"
+#include "GenericClock.hpp"
 
 namespace dcpu
 {
@@ -32,7 +32,7 @@ private :
 	// Hardware devices
 	LEM1802 m_lem;      // Monitor
 	Keyboard m_keyboard;
-	Clock m_clock;
+	GenericClock m_clock;
 
 public :
 
